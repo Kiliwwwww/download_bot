@@ -1,6 +1,6 @@
 import jmcomic
 from jmcomic import download_album
-
+from app.utils.logger_utils import logger
 from app.utils.yaml_config import YamlConfig, CONFIG_FILE, JM_CONFIG_FILE
 from app.utils.zip_utils import ZipUtils
 
@@ -26,5 +26,5 @@ def download_and_zip(jm_id: int, config_path: str = JM_CONFIG_FILE) -> str:
     # 压缩下载的文件夹
     folder_to_zip = f'{jm_downloader.get("dir_rule.base_dir")}/{jm_id}'
     output_zip = ZipUtils.zip_folder(folder_to_zip, config.get("save.dest_dir"), f"{jm_id}.zip")
-
+    logger.info(output_zip)
     return output_zip

@@ -53,3 +53,6 @@ class FileLogger:
 
     def error(self, message: str):
         self.logger.error(message)
+
+
+logger = FileLogger(name="logger")

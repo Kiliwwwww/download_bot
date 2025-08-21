@@ -2,8 +2,7 @@ import uvicorn
 
 from app.utils.yaml_config import YamlConfig, CONFIG_FILE
 from app.init.app_initializer import AppInitializer
-from app.utils.logger_utils import FileLogger
-logger = FileLogger(name="logger")
+from app.utils.logger_utils import logger
 # 创建初始化工具实例
 initializer = AppInitializer(base_dir=".", logger=logger)
 
