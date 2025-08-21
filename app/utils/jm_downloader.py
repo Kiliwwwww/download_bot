@@ -1,8 +1,8 @@
 import jmcomic
 from jmcomic import download_album
 
-from utils.yaml_config import YamlConfig, CONFIG_FILE, JM_CONFIG_FILE
-from utils.zip_utils import ZipUtils
+from app.utils.yaml_config import YamlConfig, CONFIG_FILE, JM_CONFIG_FILE
+from app.utils.zip_utils import ZipUtils
 
 
 def download_and_zip(jm_id: int, config_path: str = JM_CONFIG_FILE) -> str:
