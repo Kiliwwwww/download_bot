@@ -1,6 +1,7 @@
 import os
 import zipfile
 
+
 class ZipUtils:
     @staticmethod
     def zip_folder(src_dir, dest_dir, output_filename=None):
