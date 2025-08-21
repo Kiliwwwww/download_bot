@@ -1,6 +1,7 @@
 import os
 from app.utils.logger_utils import FileLogger
 
+
 class AppInitializer:
     """
     应用初始化工具类
@@ -21,12 +22,38 @@ class AppInitializer:
             self.logger.info(f"确认目录存在: {path}")
         return path
 
+    def check_config_files(self):
+        """
+        检查 config 目录下的配置文件是否存在
+        """
+        config_dir = os.path.join(self.base_dir, "config")
+        required_files = ["config.yml", "jm_downloader.yml"]
+
+        missing_files = []
+        for file in required_files:
+            file_path = os.path.join(config_dir, file)
+            if not os.path.exists(file_path):
+                missing_files.append(file)
+                if self.logger:
+                    self.logger.error(f"缺少配置文件: {file_path}")
+
+        if missing_files:
+            raise FileNotFoundError(
+                f"缺少必要的配置文件: {', '.join(missing_files)}, 请在配置文件夹config目录下根据example文件进行创建对应的配置文件。"
+            )
+        else:
+            if self.logger:
+                self.logger.info("所有配置文件检查通过")
+
     def initialize(self):
         """
         执行所有初始化操作
         """
-        # 示例：确保 books 目录存在
+        # 确保 books 目录存在
         self.ensure_dir("books")
+
+        # 检查配置文件
+        self.check_config_files()
+
         if self.logger:
             self.logger.info("应用初始化完成")
-
