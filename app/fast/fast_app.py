@@ -6,7 +6,7 @@ logger = FileLogger(name="logger")
 
 server_app = FastAPI()
 # 创建初始化工具实例
-initializer = AppInitializer(base_dir=".")
+initializer = AppInitializer(base_dir=".", logger=logger)
 
 
 @server_app.on_event("startup")

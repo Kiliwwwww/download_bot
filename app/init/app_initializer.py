@@ -1,5 +1,5 @@
 import os
-
+from app.utils.logger_utils import FileLogger
 
 class AppInitializer:
     """
@@ -7,8 +7,9 @@ class AppInitializer:
     用于启动前做一些目录创建、配置检查等操作
     """
 
-    def __init__(self, base_dir="."):
+    def __init__(self, base_dir=".", logger: FileLogger = None):
         self.base_dir = base_dir
+        self.logger = logger
 
     def ensure_dir(self, dir_name: str):
         """
@@ -16,7 +17,8 @@ class AppInitializer:
         """
         path = os.path.join(self.base_dir, dir_name)
         os.makedirs(path, exist_ok=True)
-        print(f"[Init] 确认目录存在: {path}")
+        if self.logger:
+            self.logger.info(f"确认目录存在: {path}")
         return path
 
     def initialize(self):
@@ -25,4 +27,6 @@ class AppInitializer:
         """
         # 示例：确保 books 目录存在
         self.ensure_dir("books")
+        if self.logger:
+            self.logger.info("应用初始化完成")
 
