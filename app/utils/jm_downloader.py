@@ -25,6 +25,7 @@ def download_and_zip(jm_id: int, config_path: str = JM_CONFIG_FILE) -> str:
 
     # 压缩下载的文件夹
     folder_to_zip = f'{jm_downloader.get("dir_rule.base_dir")}/{jm_id}'
-    output_zip = ZipUtils.zip_folder(folder_to_zip, config.get("save.dest_dir"), f"{jm_id}.zip")
+    dest_dir = config.get('save.dest_dir')
+    output_zip = ZipUtils.zip_folder(folder_to_zip, dest_dir, f"{jm_id}.zip")
     logger.info(output_zip)
-    return output_zip
+    return f"{dest_dir}/{jm_id}.zip"
