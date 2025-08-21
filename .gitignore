@@ -51,3 +51,6 @@ logs/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+config/config.yml
+config/jm_downloader.yml
