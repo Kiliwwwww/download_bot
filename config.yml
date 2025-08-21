@@ -1,10 +1,2 @@
-download:
-  image:
-    suffix: .png
-
-dir_rule:
-  base_dir: books
-client:
-  postman:
-    meta_data:
-      proxies: system
+save:
+  dest_dir: "zip"

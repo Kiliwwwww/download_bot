@@ -1,0 +1,11 @@
+download:
+  image:
+    suffix: .png
+
+dir_rule:
+  base_dir: books
+  rule: 'Bd_Aid_Pindex'
+client:
+  postman:
+    meta_data:
+      proxies: system
