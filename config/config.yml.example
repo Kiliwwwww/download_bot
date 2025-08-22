@@ -1,5 +1,4 @@
 save:
   dest_dir: "zip"
 server:
-  port: 12345
   redis: 'redis://localhost:6379/2'
