@@ -23,16 +23,19 @@
 
 ## 使用说明
 
-### 服务器启动
-```bash
-honcho start
-
-
 ### 初始化步骤
-
 ```bash
 # 安装依赖
 pip install -r requirements.txt
+#复制配置文件
+cp config/config.yml.example config/config.yml
+cp config/jm_downloader.yml.example config/jm_downloader.yml 
+```
+### 服务器启动
+
+```bash
+# 服务器启动
+honcho start
 ```
 
 ### 配置说明
