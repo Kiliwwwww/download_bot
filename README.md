@@ -2,11 +2,15 @@
 ```angular2html
  honcho start
 ```
-## 服务器必装
+## 服务器说明
 
 ```html
-redis:
-    redis的链接配置在config/config.yml里面进行修改
+redis配置:
+    config/config.yml里面进行修改
+flower地址:
+    http://{ip}:5555
+端口信息:
+    [Procfile](Procfile)文件里面修改
 ```
 ## config.yml 配置文件说明
 ```html
