@@ -13,7 +13,7 @@
 ---
 
 ## 项目介绍
-本项目是一个基于 **Python jmcomic** 二次开发的简易服务器，提供以下功能：
+本项目是一个基于 **[Python jmcomic](https://github.com/hect0x7/JMComic-Crawler-Python)** 二次开发的简易服务器，提供以下功能：
 - 异步下载漫画
 - 自动打包为压缩包（zip）
 
