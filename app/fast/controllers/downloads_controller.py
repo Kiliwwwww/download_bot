@@ -1,3 +1,5 @@
+from typing import List, Any
+
 from fastapi import APIRouter, Request
 from app.fast.service.download_service import clear_cache
 from app.fast.service.queue_service import queue_list
@@ -83,7 +85,7 @@ def clear():
             message=f"清除缓存失败: {str(e)}"
         )
 
-@router.get("/queue", response_model=StandardResponse[dict])
+@router.get("/queue", response_model=StandardResponse[List[Any]])
 def queue():
     try:
         data = queue_list()
