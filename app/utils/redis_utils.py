@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Tuple
 
 
 JM_KEY = "jm_id:download_id_hash"
+CELERY_TASK_META = "celery-task-meta"
 
 class RedisUtils:
     def __init__(self, redis_url: str = config.get("server.redis"), decode_responses=True):
@@ -74,3 +75,6 @@ class RedisUtils:
     # ----------------- 管道 -----------------
     def pipeline(self):
         return self.r.pipeline()
+
+    def redis(self):
+        return self.r

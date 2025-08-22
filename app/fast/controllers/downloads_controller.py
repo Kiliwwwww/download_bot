@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request
 from app.fast.service.download_service import clear_cache
+from app.fast.service.queue_service import queue_list
 from app.utils.logger_utils import logger
 from app.celery.tasks import read_item as job
 from app.celery.celery_worker import celery_app
@@ -19,7 +20,7 @@ def read_root():
 
 
 # 修改成异步任务 常用测试id = 422866
-@router.get("/{jm_comic_id}", response_model=StandardResponse[dict])
+@router.post("/{jm_comic_id}", response_model=StandardResponse[dict])
 def read_item(jm_comic_id: int):
     try:
         task = job.delay(jm_comic_id)
@@ -80,4 +81,18 @@ def clear():
         return StandardResponse(
             code=500,
             message=f"清除缓存失败: {str(e)}"
+        )
+
+@router.get("/queue", response_model=StandardResponse[dict])
+def queue():
+    try:
+        data = queue_list()
+        return StandardResponse(
+            data=data
+        )
+    except Exception as e:
+        logger.error(f"获取列表失败: {str(e)}")
+        return StandardResponse(
+            code=500,
+            message=f"获取列表失败: {str(e)}"
         )
