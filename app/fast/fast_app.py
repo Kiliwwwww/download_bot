@@ -6,6 +6,8 @@ from app.init.app_initializer import AppInitializer
 from app.utils.logger_utils import logger
 from fastapi.middleware.cors import CORSMiddleware  # 解决跨域问题
 
+from app.utils.yaml_config import config
+
 initializer = AppInitializer(base_dir=".", logger=logger)
 initializer.initialize()  # 直接在模块加载时执行
 
@@ -18,9 +20,9 @@ server_app.add_middleware(
     allow_headers=["*"],  # 允许所有请求头
 )
 server_app.include_router(downloads_router)
-
+dest_dir = config.get("save.dest_dir")
 # 映射静态文件
-server_app.mount("/zip", StaticFiles(directory="zip"), name="zip")
+server_app.mount(f"/{dest_dir}", StaticFiles(directory=f"{dest_dir}"), name=f"{dest_dir}")
 @server_app.get("/")
 async def root():
     return {"message": "jinman_pull_server"}
