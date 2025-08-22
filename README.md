@@ -12,6 +12,7 @@ redis:
 ```html
 save:
   dest_dir: "zip" # zip包保存路径
+  cache: true # 是否使用缓存
 server:
   redis: 'redis://localhost:6379/2' # redis地址
 ```

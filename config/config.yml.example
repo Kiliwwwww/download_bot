@@ -1,4 +1,5 @@
 save:
   dest_dir: "zip"
+  cache: true
 server:
   redis: 'redis://localhost:6379/2'
