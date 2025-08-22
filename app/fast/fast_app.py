@@ -23,8 +23,11 @@ server_app.add_middleware(
 server_app.include_router(api_router)
 server_app.include_router(admin_router)
 dest_dir = config.get("save.dest_dir")
-# 映射静态文件
+# 映射zip包的路径
 server_app.mount(f"/{dest_dir}", StaticFiles(directory=f"{dest_dir}"), name=f"{dest_dir}")
+# 映射静态文件
+server_app.mount("public", StaticFiles(directory="public"), name="public")
+
 @server_app.get("/")
 async def root():
     return {"message": "jinman_pull_server"}
