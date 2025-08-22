@@ -13,7 +13,7 @@ def read_item(jm_comic_id: int):
         return {"item_id": jm_comic_id, 'url': url}
     except Exception as e:
         logger.error(e)
-        return {"item_id": jm_comic_id, "error": str(e)}
+        return {"item_id": jm_comic_id, 'url': "", "error": str(e)}
 
 
 
