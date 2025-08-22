@@ -7,5 +7,6 @@ logger.info(redis_url)
 celery_app = Celery(
     "worker",
     broker=redis_url,  # Redis 作为消息队列
-    backend=redis_url  # 存储任务结果
+    backend=redis_url,  # 存储任务结果
+    include=["app.celery.tasks"]
 )
