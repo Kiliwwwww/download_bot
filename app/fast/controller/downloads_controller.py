@@ -2,7 +2,7 @@
 from fastapi import APIRouter
 from app.fast.service.download_service import clear_cache
 from app.utils.logger_utils import logger
-from app.celery.tasks import read_item as job
+from app.job.download_job import read_item as job
 
 from app.utils.standard_responese import StandardResponse
 
