@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from app.utils.logger_utils import logger
 from app.celery.tasks import read_item as job
 from app.celery.celery_worker import celery_app
@@ -20,8 +20,9 @@ def read_item(jm_comic_id: int):
 
 
 @router.get("/result/{task_id}")
-async def get_result(task_id: str):
+async def get_result(task_id: str,request: Request):
+    base_url = str(request.base_url)
     task_result = AsyncResult(task_id, app=celery_app)
     if task_result.ready():
-        return {"status": "done", "result": task_result.result}
+        return {"status": "done", "result": f"{base_url}{task_result.result['url']}"}
     return {"status": "pending"}

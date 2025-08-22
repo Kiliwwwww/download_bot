@@ -10,7 +10,7 @@ def read_item(jm_comic_id: int):
     logger.info(f"{jm_comic_id}开始下载")
     try:
         url = download_jm_comic(jm_comic_id)
-        return {"item_id": jm_comic_id, url: url}
+        return {"item_id": jm_comic_id, 'url': url}
     except Exception as e:
         logger.error(e)
         return {"item_id": jm_comic_id, "error": str(e)}
