@@ -1,7 +1,6 @@
 from fastapi import APIRouter
-from app.fast.service.download_service import download_jm_comic
 from app.utils.logger_utils import logger
-from app.celery.tasks import long_task
+from app.celery.tasks import read_item as job
 from app.celery.celery_worker import celery_app
 from celery.result import AsyncResult
 
@@ -13,15 +12,10 @@ def read_root():
     return {"message": "Hello, FastAPI"}
 
 
+# 修改成异步任务 常用测试id = 422866
 @router.get("/{jm_comic_id}")
-def read_item(jm_comic_id: int, q: str = None):
-    url = download_jm_comic(jm_comic_id)
-    return {"item_id": jm_comic_id, url: url}
-
-
-@router.get("/add/{x}/{y}")
-async def add(x: int, y: int):
-    task = long_task.delay(x, y)  # 提交异步任务
+def read_item(jm_comic_id: int):
+    task = job.delay(jm_comic_id)
     return {"task_id": task.id}
 
 
