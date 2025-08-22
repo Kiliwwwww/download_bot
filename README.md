@@ -5,6 +5,8 @@
 ## 服务器说明
 
 ```html
+初始化
+    pip install -r requirements.txt
 redis配置:
     config/config.yml里面进行修改
 flower地址:
