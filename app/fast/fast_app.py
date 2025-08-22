@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.fast.controllers.downloads_controller import router as downloads_router
+from app.fast.router.api import api_router
 from app.init.app_initializer import AppInitializer
 from app.utils.logger_utils import logger
 from fastapi.middleware.cors import CORSMiddleware  # 解决跨域问题
@@ -19,7 +19,7 @@ server_app.add_middleware(
     allow_methods=["*"],  # 允许所有 HTTP 方法（GET/POST/PUT 等）
     allow_headers=["*"],  # 允许所有请求头
 )
-server_app.include_router(downloads_router)
+server_app.include_router(api_router)
 dest_dir = config.get("save.dest_dir")
 # 映射静态文件
 server_app.mount(f"/{dest_dir}", StaticFiles(directory=f"{dest_dir}"), name=f"{dest_dir}")
