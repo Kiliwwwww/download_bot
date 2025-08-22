@@ -36,3 +36,9 @@ class YamlConfig:
     def data(self):
         """返回整个配置字典"""
         return self._config
+
+
+# 默认配置
+config = YamlConfig(CONFIG_FILE)
+# jm下载配置
+jm_downloader = YamlConfig(JM_CONFIG_FILE)
