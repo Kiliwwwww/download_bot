@@ -6,7 +6,7 @@ from app.utils.logger_utils import logger
 # 创建初始化工具实例
 initializer = AppInitializer(base_dir=".", logger=logger)
 
-
+# 已弃用 换成honcho start 命令启动
 if __name__ == "__main__":
     initializer.initialize()
     port = config.get("server.port")
