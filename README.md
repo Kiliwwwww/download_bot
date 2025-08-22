@@ -1,35 +1,65 @@
+# 项目文档
+
+## 目录
+- [项目介绍](#项目介绍)
+- [使用说明](#使用说明)
+  - [服务器启动](#服务器启动)
+  - [初始化步骤](#初始化步骤)
+  - [配置说明](#配置说明)
+- [配置文件说明](#配置文件说明)
+  - [config.yml](#configyml)
+  - [jm_downloader.yml](#jm_downloaderyml)
+
+---
+
 ## 项目介绍
-一个基于python jmcomic 二次开发的简易服务器项目，提供了异步下载和打包成压缩包的功能
-使用fast api + celery + honcho + redis 快速构建项目
+本项目是一个基于 **Python jmcomic** 二次开发的简易服务器，提供以下功能：
+- 异步下载漫画
+- 自动打包为压缩包（zip）
+
+技术栈：**FastAPI + Celery + Honcho + Redis**
+
+---
+
+## 使用说明
+
+### 服务器启动
+```bash
+honcho start
 
 
-### 服务器启动命令
-```angular2html
- honcho start
+### 初始化步骤
+
+```bash
+# 安装依赖
+pip install -r requirements.txt
 ```
-### 服务器说明
 
-```html
-初始化
-    pip install -r requirements.txt
-redis配置:
-    config/config.yml里面进行修改
-flower地址:
-    http://{ip}:5555
-端口信息:
-    [Procfile](Procfile)文件里面修改
-```
-### config.yml 配置文件说明
-```html
+### 配置说明
+
+* **Redis 配置**
+  修改 `config/config.yml` 文件中的 `server.redis` 字段。
+* **Flower 监控地址**
+  `http://{ip}:5555`
+* **端口配置**
+  修改 [Procfile](Procfile) 文件。
+
+---
+
+## 配置文件说明
+
+### config.yml
+
+```yaml
 save:
-  dest_dir: "zip" # zip包保存路径
-  cache: true # 是否使用缓存
+  dest_dir: "zip"       # zip 包保存路径
+  cache: true           # 是否启用缓存
 server:
-  redis: 'redis://localhost:6379/2' # redis地址
+  redis: "redis://localhost:6379/2"  # Redis 地址
 ```
 
-### jm_downloader.yml  配置文件说明
+### jm\_downloader.yml
 
-```html
-官方说明 https://github.com/hect0x7/JMComic-Crawler-Python/blob/master/assets/docs/sources/option_file_syntax.md
-```
+详细配置可参考官方文档：
+[JMComic 配置文件语法说明](https://github.com/hect0x7/JMComic-Crawler-Python/blob/master/assets/docs/sources/option_file_syntax.md)
+
