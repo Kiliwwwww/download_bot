@@ -8,10 +8,19 @@ export function createTaskTable(Vue, naive) {
     template: `
       <n-card title="任务队列" size="huge" :bordered="false">
         <n-space justify="space-between" align="center" style="margin-bottom: 15px;">
-          <n-button type="primary" @click="loadTasks" :loading="loading">刷新</n-button>
+          <div style="display: flex; gap: 10px;">
+            <n-button type="primary" @click="openDownloadPage">下载本子</n-button>
+            <n-button type="primary" @click="loadTasks" :loading="loading">刷新</n-button>
+          </div>
           <n-text depth="3">共 {{ tasks.length }} 个任务</n-text>
         </n-space>
-        <n-data-table :columns="columns" :data="tasks" :bordered="true" :single-line="false"></n-data-table>
+
+        <n-data-table 
+          :columns="columns" 
+          :data="tasks" 
+          :bordered="true" 
+          :single-line="false">
+        </n-data-table>
       </n-card>
     `,
     setup() {
@@ -48,9 +57,13 @@ export function createTaskTable(Vue, naive) {
         loading.value = false
       }
 
+      const openDownloadPage = () => {
+        window.open('/admins/pages/download.html', '_blank')
+      }
+
       loadTasks()
 
-      return { tasks, loading, columns, loadTasks }
+      return { tasks, loading, columns, loadTasks, openDownloadPage }
     },
     components: { NCard, NSpace, NButton, NText, NDataTable }
   }

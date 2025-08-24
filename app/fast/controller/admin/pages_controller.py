@@ -17,3 +17,6 @@ templates.env = jinja_env  # 替换掉默认的 env
 @pages_router.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+@pages_router.get("/{file_name}", response_class=HTMLResponse)
+async def read_file_name(file_name: str ,request: Request):
+    return templates.TemplateResponse(f"{file_name}", {"request": request})
