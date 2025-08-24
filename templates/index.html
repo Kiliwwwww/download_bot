@@ -1,31 +1,41 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8">
-  <title>任务队列展示</title>
-  <script src="/public/vue.global.prod.js"></script>
-  <script src="/public/axios.min.js"></script>
-  <script src="/public/naive-ui.prod.js"></script>
-  <style>
-    body { font-family: Arial; margin: 20px; background: #f5f5f5; }
-    #app { max-width: 1000px; margin: auto; }
-  </style>
+    <link rel="icon" href="/public/logo.svg" type="image/x-icon">
+    <meta charset="UTF-8">
+    <title>任务队列展示</title>
+    <script src="/public/vue.global.prod.js"></script>
+    <script src="/public/axios.min.js"></script>
+    <script src="/public/naive-ui.prod.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+
+        #app {
+            max-width: 1000px;
+            margin: auto;
+        }
+    </style>
 </head>
 <body>
-  <div id="app"></div>
+<div id="app"></div>
 
-  <script type="module">
-    import { createTaskTable } from '/public/js/components/taskTable.js'
+<script type="module">
+    import {createTaskTable} from '/public/js/components/taskTable.js'
 
     const app = Vue.createApp({
-      template: `<task-table />`,
-      components: {
-        'task-table': createTaskTable(Vue, naive)
-      }
+        template: `
+          <task-table/>`,
+        components: {
+            'task-table': createTaskTable(Vue, naive)
+        }
     })
 
     app.use(naive)
     app.mount('#app')
-  </script>
+</script>
 </body>
 </html>

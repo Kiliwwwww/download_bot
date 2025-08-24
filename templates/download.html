@@ -1,10 +1,46 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>下载本子</title>
+    <link rel="icon" href="/public/logo.svg" type="image/x-icon">
+    <!-- Vue 3 -->
+    <script src="/public/vue.global.prod.js"></script>
+    <!-- Axios -->
+    <script src="/public/axios.min.js"></script>
+    <!-- Naive UI -->
+    <script src="/public/naive-ui.prod.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 </head>
 <body>
+<div id="app"></div>
 
+<script type="module">
+    import {createDownloadForm} from '/public/js/components/downloadForm.js'
+
+    const {NMessageProvider} = naive
+
+    const App = {
+        template: `
+          <n-message-provider>
+            <download-form/>
+          </n-message-provider>`,
+        components: {
+            'download-form': createDownloadForm(Vue, naive),
+            NMessageProvider
+        }
+    }
+
+    const app = Vue.createApp(App)
+    app.use(naive)
+    app.mount('#app')
+</script>
 </body>
 </html>
