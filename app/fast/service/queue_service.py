@@ -8,7 +8,7 @@ redis_util = RedisUtils(config.get("server.redis_end"))
 r = redis_util.redis()
 
 
-def queue_list(page=1, per_page=20, sort_key="create_time", reverse=True):
+def queue_list(page=1, per_page=20, sort_key="date_done", reverse=True):
     """
     获取任务队列列表（支持排序 + 分页）
     :param page: 当前页码，从 1 开始

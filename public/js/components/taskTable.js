@@ -85,7 +85,22 @@ export function createTaskTable(Vue, naive) {
                         )
                     }
                 },
-                { title: '完成时间', key: 'date_done' },
+                {
+                        title: '完成时间',
+                        key: 'date_done',
+                        render(row) {
+                            if (!row.date_done) return ''
+                            const date = new Date(row.date_done)
+                            // 格式化成 YYYY-MM-DD HH:mm:ss
+                            const formatted = date.getFullYear() + '-' +
+                                String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                                String(date.getDate()).padStart(2, '0') + ' ' +
+                                String(date.getHours()).padStart(2, '0') + ':' +
+                                String(date.getMinutes()).padStart(2, '0') + ':' +
+                                String(date.getSeconds()).padStart(2, '0')
+                            return formatted
+                        }
+                },
                 {
                     title: '结果',
                     key: 'result',
