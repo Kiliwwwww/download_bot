@@ -1,6 +1,6 @@
 from typing import List, Any
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Query
 from app.fast.service.queue_service import queue_list
 from app.utils.logger_utils import logger
 from app.celery.celery_worker import celery_app
@@ -12,9 +12,10 @@ tasks_router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
 @tasks_router.get("/queue", response_model=StandardResponse[dict])
-def queue():
+def queue(page: int = Query(1, ge=1), per_page: int = Query(10, ge=1, le=100)):
     try:
-        data = queue_list()
+        logger.info(f"page={page}, per_page={per_page}")
+        data = queue_list(page,per_page)
         return StandardResponse(
             data=data
         )

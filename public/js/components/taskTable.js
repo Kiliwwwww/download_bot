@@ -1,8 +1,8 @@
-import {fetchTasks} from '../api/taskService.js'
+import { fetchTasks } from '../api/taskService.js'  // ✅ 使用相对路径，确保加载的是修改后的文件
 
 export function createTaskTable(Vue, naive) {
-    const {ref, h} = Vue
-    const {NCard, NSpace, NButton, NText, NDataTable, NModal} = naive
+    const { ref, h, computed } = Vue
+    const { NCard, NSpace, NButton, NText, NDataTable, NModal } = naive
 
     return {
         template: `
@@ -24,10 +24,14 @@ export function createTaskTable(Vue, naive) {
           :loading="loading">
         </n-data-table>
 
-        <!-- 弹窗 -->
         <n-modal v-model:show="showErrorModal" preset="dialog" title="错误详情">
           <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap;">
             {{ currentError }}
+          </div>
+        </n-modal>
+        <n-modal v-model:show="showIdModal" preset="dialog" title="详情">
+          <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap;">
+            {{ currentId }}
           </div>
         </n-modal>
       </n-card>
@@ -41,11 +45,18 @@ export function createTaskTable(Vue, naive) {
             const task_id_max_size = 8
             // 弹窗状态
             const showErrorModal = ref(false)
+            const showIdModal = ref(false)
             const currentError = ref("")
+            const currentId = ref("")
 
             const openErrorModal = (msg) => {
                 currentError.value = msg
                 showErrorModal.value = true
+            }
+
+            const openIdModal = (msg) => {
+                currentId.value = msg
+                showIdModal.value = true
             }
 
             const columns = [
@@ -56,6 +67,9 @@ export function createTaskTable(Vue, naive) {
                         const shortText = row.task_id.length > task_id_max_size ? row.task_id.slice(0, task_id_max_size) : row.task_id
                         return h(
                             'span',
+                            {
+                                    onClick: () => openIdModal("任务ID:  "+row.task_id)
+                            },
                             shortText
                         )
                     }
@@ -66,12 +80,12 @@ export function createTaskTable(Vue, naive) {
                     render(row) {
                         return h(
                             'span',
-                            {style: {color: row.status === 'SUCCESS' ? 'green' : 'orange'}},
-                            row.status === "SUCCESS" ? "已结束" : "进行中"
+                            { style: { color: row.status === 'SUCCESS' ? 'green' : 'red' } },
+                            row.status === "SUCCESS" ? "已结束" : "失败"
                         )
                     }
                 },
-                {title: '完成时间', key: 'date_done'},
+                { title: '完成时间', key: 'date_done' },
                 {
                     title: '结果',
                     key: 'result',
@@ -82,15 +96,14 @@ export function createTaskTable(Vue, naive) {
                             return h(
                                 'span',
                                 {
-                                    style: {color: 'red', cursor: 'pointer', textDecoration: 'underline'},
+                                    style: { color: 'red', cursor: 'pointer', textDecoration: 'underline' },
                                     onClick: () => openErrorModal(text)
                                 },
                                 shortText
                             )
                         } else if (row.result && row.result.url) {
-                            const baseUrl = window.location.origin + '/'
-                            const fullUrl = baseUrl + row.result.url
-                            return h('a', {href: fullUrl, target: '_blank'}, row.result.item_id || '查看')
+                            const fullUrl = window.location.origin + '/' + row.result.url
+                            return h('a', { href: fullUrl, target: '_blank' }, row.result.item_id || '查看')
                         }
                         return null
                     }
@@ -98,14 +111,16 @@ export function createTaskTable(Vue, naive) {
             ]
 
             const loadTasks = async () => {
+                console.log("loadTasks called", page.value, perPage.value)
                 loading.value = true
                 const res = await fetchTasks(page.value, perPage.value)
-                tasks.value = res.items
-                total.value = res.total
+                console.log("fetch result", res)
+                tasks.value = res.items || []
+                total.value = res.total || 0
                 loading.value = false
             }
 
-            const pagination = {
+            const pagination = computed(() => ({
                 page: page.value,
                 pageSize: perPage.value,
                 itemCount: total.value,
@@ -120,14 +135,13 @@ export function createTaskTable(Vue, naive) {
                     page.value = 1
                     loadTasks()
                 }
-            }
+            }))
 
             const openDownloadPage = () => {
                 window.open('/admins/pages/download.html', '_blank')
             }
 
-            // 首次加载
-            loadTasks()
+            loadTasks()  // 首次加载
 
             return {
                 tasks,
@@ -138,9 +152,11 @@ export function createTaskTable(Vue, naive) {
                 loadTasks,
                 openDownloadPage,
                 showErrorModal,
+                showIdModal,
+                currentId,
                 currentError
             }
         },
-        components: {NCard, NSpace, NButton, NText, NDataTable, NModal}
+        components: { NCard, NSpace, NButton, NText, NDataTable, NModal }
     }
 }
