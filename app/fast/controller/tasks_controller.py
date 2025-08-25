@@ -11,7 +11,7 @@ from app.utils.standard_responese import StandardResponse
 tasks_router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
-@tasks_router.get("/queue", response_model=StandardResponse[List[Any]])
+@tasks_router.get("/queue", response_model=StandardResponse[dict])
 def queue():
     try:
         data = queue_list()

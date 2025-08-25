@@ -1,70 +1,146 @@
-import { fetchTasks } from '../api/taskService.js'
+import {fetchTasks} from '../api/taskService.js'
 
 export function createTaskTable(Vue, naive) {
-  const { ref, h } = Vue
-  const { NCard, NSpace, NButton, NText, NDataTable } = naive
+    const {ref, h} = Vue
+    const {NCard, NSpace, NButton, NText, NDataTable, NModal} = naive
 
-  return {
-    template: `
+    return {
+        template: `
       <n-card title="任务队列" size="huge" :bordered="false">
         <n-space justify="space-between" align="center" style="margin-bottom: 15px;">
           <div style="display: flex; gap: 10px;">
             <n-button type="primary" @click="openDownloadPage">下载本子</n-button>
             <n-button type="primary" @click="loadTasks" :loading="loading">刷新</n-button>
           </div>
-          <n-text depth="3">共 {{ tasks.length }} 个任务</n-text>
+          <n-text depth="3">共 {{ total }} 个任务</n-text>
         </n-space>
 
         <n-data-table 
           :columns="columns" 
           :data="tasks" 
           :bordered="true" 
-          :single-line="false">
+          :single-line="false"
+          :pagination="pagination"
+          :loading="loading">
         </n-data-table>
+
+        <!-- 弹窗 -->
+        <n-modal v-model:show="showErrorModal" preset="dialog" title="错误详情">
+          <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap;">
+            {{ currentError }}
+          </div>
+        </n-modal>
       </n-card>
     `,
-    setup() {
-      const tasks = ref([])
-      const loading = ref(false)
+        setup() {
+            const tasks = ref([])
+            const total = ref(0)
+            const page = ref(1)
+            const perPage = ref(10)
+            const loading = ref(false)
+            const task_id_max_size = 8
+            // 弹窗状态
+            const showErrorModal = ref(false)
+            const currentError = ref("")
 
-      const columns = [
-        { title: '任务ID', key: 'task_id' },
-        {
-          title: '状态',
-          key: 'status',
-          render(row) {
-            return h('span', { style: { color: row.status === 'SUCCESS' ? 'green' : 'red' } }, row.status)
-          }
-        },
-        { title: '完成时间', key: 'date_done' },
-        {
-          title: '结果',
-          key: 'result',
-          render(row) {
-            if (row.result && row.result.url) {
-              const baseUrl = window.location.origin + '/'
-              const fullUrl = baseUrl + row.result.url
-              return h('a', { href: fullUrl, target: '_blank' }, row.result.item_id || '查看')
+            const openErrorModal = (msg) => {
+                currentError.value = msg
+                showErrorModal.value = true
             }
-            return null
-          }
-        }
-      ]
 
-      const loadTasks = async () => {
-        loading.value = true
-        tasks.value = await fetchTasks()
-        loading.value = false
-      }
+            const columns = [
+                {
+                    title: '任务ID',
+                    key: 'task_id',
+                    render(row) {
+                        const shortText = row.task_id.length > task_id_max_size ? row.task_id.slice(0, task_id_max_size) : row.task_id
+                        return h(
+                            'span',
+                            shortText
+                        )
+                    }
+                },
+                {
+                    title: '状态',
+                    key: 'status',
+                    render(row) {
+                        return h(
+                            'span',
+                            {style: {color: row.status === 'SUCCESS' ? 'green' : 'orange'}},
+                            row.status === "SUCCESS" ? "已结束" : "进行中"
+                        )
+                    }
+                },
+                {title: '完成时间', key: 'date_done'},
+                {
+                    title: '结果',
+                    key: 'result',
+                    render(row) {
+                        if (row.result && row.result.error) {
+                            const text = row.result.error
+                            const shortText = text.length > 30 ? text.slice(0, 30) + "..." : text
+                            return h(
+                                'span',
+                                {
+                                    style: {color: 'red', cursor: 'pointer', textDecoration: 'underline'},
+                                    onClick: () => openErrorModal(text)
+                                },
+                                shortText
+                            )
+                        } else if (row.result && row.result.url) {
+                            const baseUrl = window.location.origin + '/'
+                            const fullUrl = baseUrl + row.result.url
+                            return h('a', {href: fullUrl, target: '_blank'}, row.result.item_id || '查看')
+                        }
+                        return null
+                    }
+                }
+            ]
 
-      const openDownloadPage = () => {
-        window.open('/admins/pages/download.html', '_blank')
-      }
+            const loadTasks = async () => {
+                loading.value = true
+                const res = await fetchTasks(page.value, perPage.value)
+                tasks.value = res.items
+                total.value = res.total
+                loading.value = false
+            }
 
-      loadTasks()
+            const pagination = {
+                page: page.value,
+                pageSize: perPage.value,
+                itemCount: total.value,
+                showSizePicker: true,
+                pageSizes: [10, 20, 50],
+                onChange: (newPage) => {
+                    page.value = newPage
+                    loadTasks()
+                },
+                onUpdatePageSize: (newSize) => {
+                    perPage.value = newSize
+                    page.value = 1
+                    loadTasks()
+                }
+            }
 
-      return { tasks, loading, columns, loadTasks, openDownloadPage }
-    },
-    components: { NCard, NSpace, NButton, NText, NDataTable }
-  }
+            const openDownloadPage = () => {
+                window.open('/admins/pages/download.html', '_blank')
+            }
+
+            // 首次加载
+            loadTasks()
+
+            return {
+                tasks,
+                total,
+                loading,
+                columns,
+                pagination,
+                loadTasks,
+                openDownloadPage,
+                showErrorModal,
+                currentError
+            }
+        },
+        components: {NCard, NSpace, NButton, NText, NDataTable, NModal}
+    }
 }

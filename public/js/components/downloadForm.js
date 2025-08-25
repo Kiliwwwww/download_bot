@@ -28,12 +28,11 @@ export function createDownloadForm(Vue, naive) {
                     message.warning('请输入ID')
                     return
                 }
-                message.info('正在下载...')
+                message.info('下载任务进入队列')
                 const res = await downloadById(inputId.value.trim())
                 if (res.code === 200) {
-                    message.success('下载完成')
                     setTimeout(() => {
-                        window.location.href = '/index.html'
+                        window.location.href = '/admins/pages'
                     }, 1000)
                 } else {
                     message.error(res.message || '下载失败')
