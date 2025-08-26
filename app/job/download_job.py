@@ -13,16 +13,15 @@ import time
 @celery_app.task
 def read_item(jm_comic_id: int):
     logger.info(f"{jm_comic_id}开始下载")
+    task_id = current_task.request.id
     try:
         url = download_jm_comic(jm_comic_id)
         logger.info("sleep start")
         sleep(20)
         logger.info("sleep end")
-        task_id = current_task.request.id
         TaskRecord.update_record({"task_id": task_id}, status="SUCCESS", result={"item_id": jm_comic_id, 'url': url})
         return {"item_id": jm_comic_id, 'url': url}
     except Exception as e:
         logger.error(e)
-        task_id = current_task.request.id
         TaskRecord.update_record({"task_id": task_id}, status="SUCCESS", result={"item_id": jm_comic_id, 'url': "", 'error': str(e)})
         return {"item_id": jm_comic_id, 'url': "", 'error': str(e)}
