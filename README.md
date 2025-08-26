@@ -75,6 +75,12 @@ jinman/
 ---
 
 ## 使用说明
+### 环境说明
+```bash
+# 推荐使用Linux环境或者是Macos
+# 使用Window的同学可以配置Docker环境，在Docker环境下拉取python:3.12的镜像
+docker pull python:3.12
+```
 
 ### 初始化步骤
 
