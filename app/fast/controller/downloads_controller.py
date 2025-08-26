@@ -17,13 +17,13 @@ def read_root():
     )
 
 class Item(BaseModel):
-    jm_comic_ids: str
+    jm_comic_ids: list
 # 修改成异步任务 常用测试id = 422866
 @downloads_router.post("/", response_model=StandardResponse[dict])
 def read_item(item: Item):
     try:
         task_ids = []
-        for item in item.jm_comic_ids.split(','):
+        for item in item.jm_comic_ids:
             jm_comic_id = int(item)
             task = start_download(jm_comic_id)
             task_ids.append(task.id)
