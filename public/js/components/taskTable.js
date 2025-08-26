@@ -1,112 +1,194 @@
-// downloadForm.js
-import { downloadById } from '../api/downloadService.js'
+// taskTable.js
+import {fetchTasks} from '../api/taskService.js'
 
-export function createDownloadForm(Vue, naive) {
-  const { ref } = Vue
-  const { NCard, NInput, NButton, NSpace, NTag, useMessage } = naive
+export function createTaskTable(Vue, naive) {
+    const {ref, h, computed} = Vue
+    const {NCard, NSpace, NButton, NText, NDataTable, NModal} = naive
 
-  // 随机颜色函数
-  const getRandomColor = () => {
-    const colors = ['#f56c6c', '#e6a23c', '#67c23a', '#409eff', '#909399', '#ff69b4', '#00ced1']
-    return colors[Math.floor(Math.random() * colors.length)]
-  }
-
-  return {
-    template: `
-    <div style="display: flex; justify-content: center; margin-top: 60px;">
-      <n-card style="width: 500px; padding: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;">
-        <h2 style="text-align: center; margin-bottom: 25px; font-weight: 600; color: #333;">下载</h2>
-        <n-space vertical size="large" style="width: 100%;">
-
-          <!-- 输入框 -->
-          <n-input
-            v-model:value="inputId"
-            placeholder="请输入ID，按回车保存"
-            @keyup.enter="handleEnter"
-            style="width: 100%; font-size: 14px;"
-          ></n-input>
-
-          <!-- 已保存的 ID 标签，添加动画 -->
-          <transition-group name="tag-fade" tag="div" style="display: flex; flex-wrap: wrap; gap: 8px;">
-            <n-tag
-              v-for="(item, index) in savedIds"
-              :key="item.id"
-              closable
-              :type="item.color"
-              @close="removeId(index)"
-            >
-              {{ item.id }}
-            </n-tag>
-          </transition-group>
-
-          <!-- 操作按钮 -->
-          <n-space justify="center" style="margin-top: 10px;">
-            <n-button type="primary" size="medium" @click="handleDownload">下载</n-button>
-            <n-button size="medium" @click="handleCancel">取消</n-button>
-          </n-space>
-
+    return {
+        template: `
+    <div style="display: flex; justify-content: center; margin-top: 50px;">
+      <n-card style="width: 900px; padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;" title="任务队列" size="huge" :bordered="false">
+        
+        <!-- 顶部操作区 -->
+        <n-space justify="space-between" align="center" style="margin-bottom: 20px;">
+          <div style="display: flex; gap: 12px;">
+            <n-button type="primary" size="medium" @click="openDownloadPage">下载</n-button>
+            <n-button type="primary" size="medium" :loading="loading" @click="loadTasks">刷新</n-button>
+          </div>
+          <n-text depth="3">共 {{ total }} 个任务</n-text>
         </n-space>
+
+        <!-- 数据表 -->
+        <n-data-table
+          :columns="columns"
+          :data="tasks"
+          :bordered="true"
+          :single-line="false"
+          :pagination="pagination"
+          :loading="loading"
+          size="medium"
+          style="border-radius: 8px;"
+        ></n-data-table>
+
+        <!-- 弹窗: 错误详情 -->
+        <n-modal v-model:show="showErrorModal" preset="dialog" title="错误详情" style="max-width: 500px;">
+          <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap; padding: 10px; line-height: 1.5; color: #333;">
+            {{ currentError }}
+          </div>
+        </n-modal>
+
+        <!-- 弹窗: 任务ID详情 -->
+        <n-modal v-model:show="showIdModal" preset="dialog" title="详情" style="max-width: 500px;">
+          <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap; padding: 10px; line-height: 1.5; color: #333;">
+            {{ currentId }}
+          </div>
+        </n-modal>
       </n-card>
     </div>
-
-    <!-- 动画样式 -->
-    <style>
-      .tag-fade-enter-active, .tag-fade-leave-active {
-        transition: all 0.3s ease;
-      }
-      .tag-fade-enter-from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      .tag-fade-leave-to {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-    </style>
     `,
-    setup() {
-      const inputId = ref('')
-      const savedIds = ref([])
-      const message = useMessage()
+        setup() {
+            const tasks = ref([])
+            const total = ref(0)
+            const page = ref(1)
+            const perPage = ref(10)
+            const loading = ref(false)
+            const task_id_max_size = 8
 
-      const handleEnter = () => {
-        const id = inputId.value.trim()
-        if (!id) {
-          message.warning('ID不能为空')
-          return
-        }
-        if (!savedIds.value.some(item => item.id === id)) {
-          savedIds.value.push({ id, color: getRandomColor() })
-        }
-        inputId.value = ''
-      }
+            const showErrorModal = ref(false)
+            const showIdModal = ref(false)
+            const currentError = ref('')
+            const currentId = ref('')
 
-      const removeId = (index) => {
-        savedIds.value.splice(index, 1)
-      }
+            const openErrorModal = (msg) => {
+                currentError.value = msg
+                showErrorModal.value = true
+            }
 
-      const handleDownload = async () => {
-        if (!savedIds.value.length) {
-          message.warning('请先输入至少一个ID')
-          return
-        }
-        message.info('下载任务进入队列')
-        const res = await downloadById(savedIds.value.map(item => item.id))
-        if (res.code === 200) {
-          setTimeout(() => {
-            window.location.href = '/admins/pages'
-          }, 1000)
-        } else {
-          message.error(res.message || '下载失败')
-        }
-      }
+            const openIdModal = (msg) => {
+                currentId.value = msg
+                showIdModal.value = true
+            }
 
-      const handleCancel = () => {
-        window.location.href = '/admins/pages'
-      }
+            const columns = [
+                {
+                    title: '任务ID',
+                    key: 'task_id',
+                    render(row) {
+                        const shortText = row.task_id.length > task_id_max_size ? row.task_id.slice(0, task_id_max_size) + '...' : row.task_id
+                        return h(
+                            'span',
+                            {
+                                style: {cursor: 'pointer', color: '#409EFF'},
+                                onClick: () => openIdModal('任务ID:  ' + row.task_id)
+                            },
+                            shortText
+                        )
+                    }
+                },
+                {
+                    title: '状态',
+                    key: 'status',
+                    render(row) {
+                        let status = '失败'
+                        let color = 'red'
+                        if (row.status === 'SUCCESS') {
+                            status = '已结束'
+                            color = 'green'
+                        } else if (row.status === 'RUNNING') {
+                            status = '进行中'
+                            color = '#409EFF'
+                        }
+                        return h('span', {style: {color, fontWeight: 500}}, status)
+                    }
+                },
+                {
+                    title: '开始时间',
+                    key: 'start_time',
+                    render(row) {
+                        if (!row.start_time) return ''
+                        const d = new Date(row.start_time)
+                        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
+                    }
+                },
+                {
+                    title: '完成时间',
+                    key: 'end_time',
+                    render(row) {
+                        if (!row.end_time) return ''
+                        const d = new Date(row.end_time)
+                        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
+                    }
+                },
+                {
+                    title: '结果',
+                    key: 'result',
+                    render(row) {
+                        if (row.result && row.result.error) {
+                            const text = row.result.error
+                            const shortText = text.length > 30 ? text.slice(0, 30) + '...' : text
+                            return h('span', {
+                                style: {color: 'red', cursor: 'pointer', textDecoration: 'underline'},
+                                onClick: () => openErrorModal(text)
+                            }, shortText)
+                        } else if (row.result && row.result.url) {
+                            const fullUrl = window.location.origin + '/' + row.result.url
+                            return h('a', {
+                                href: fullUrl,
+                                target: '_blank',
+                                style: {color: '#409EFF'}
+                            }, row.result.item_id || '查看')
+                        }
+                        return null
+                    }
+                }
+            ]
 
-      return { inputId, savedIds, handleEnter, removeId, handleDownload, handleCancel }
-    },
-    components: { NCard, NInput, NButton, NSpace, NTag }
-  }
+            const loadTasks = async () => {
+                loading.value = true
+                const res = await fetchTasks(page.value, perPage.value)
+                tasks.value = res.items || []
+                total.value = res.total || 0
+                loading.value = false
+            }
+
+            const pagination = computed(() => ({
+                page: page.value,
+                pageSize: perPage.value,
+                itemCount: total.value,
+                showSizePicker: true,
+                pageSizes: [10, 20, 50],
+                onChange: (newPage) => {
+                    page.value = newPage
+                    loadTasks()
+                },
+                onUpdatePageSize: (newSize) => {
+                    perPage.value = newSize
+                    page.value = 1
+                    loadTasks()
+                }
+            }))
+
+            const openDownloadPage = () => {
+                window.location.href = '/admins/pages/download.html'
+            }
+
+            loadTasks()
+
+            return {
+                tasks,
+                total,
+                loading,
+                columns,
+                pagination,
+                loadTasks,
+                openDownloadPage,
+                showErrorModal,
+                showIdModal,
+                currentId,
+                currentError
+            }
+        },
+        components: {NCard, NSpace, NButton, NText, NDataTable, NModal}
+    }
 }
