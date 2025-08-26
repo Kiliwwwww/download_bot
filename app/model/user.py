@@ -1,4 +1,4 @@
-from peewee import IntegerField, CharField
+from peewee import *
 
 from db.db_manager import DBManager
 
