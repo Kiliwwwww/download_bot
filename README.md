@@ -112,7 +112,7 @@ python create_migration.py add_email_to_users
 
 create_migration命令使用说明: [create_migration.md](md/create_migration.md)
 
-query_builder数据库链式调用工具类使用说明[query_builder.md](md/query_builder.md)
+query_builder数据库链式调用工具类使用说明: [query_builder.md](md/query_builder.md)
 ### 配置说明
 
 * **Redis 配置**
