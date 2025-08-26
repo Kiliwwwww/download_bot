@@ -52,5 +52,7 @@ logs/
 ehthumbs.db
 Thumbs.db
 app.sqlite
+test.py
+
 config/config.yml
 config/jm_downloader.yml
