@@ -23,5 +23,6 @@ def read_item(jm_comic_id: int):
         return {"item_id": jm_comic_id, 'url': url}
     except Exception as e:
         logger.error(e)
+        task_id = current_task.request.id
         TaskRecord.update_record({"task_id": task_id}, status="SUCCESS", result={"item_id": jm_comic_id, 'url': "", 'error': str(e)})
         return {"item_id": jm_comic_id, 'url': "", 'error': str(e)}
