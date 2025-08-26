@@ -1,5 +1,8 @@
 import os
+from time import sleep
+
 from app.utils.logger_utils import FileLogger, logger
+from db.migration_checker import MigrationChecker
 
 
 class AppInitializer:
@@ -67,6 +70,13 @@ class AppInitializer:
 
         # 检查配置文件
         self.check_config_files()
+        checker = MigrationChecker()
+        if checker.has_pending():
+            checker.print_pending()  # 输出未执行的迁移
+            checker.close()
+            raise "迁移任务未完成"
+        else:
+            logger.info("迁移任务执行完成")
 
         if self.logger:
             self.logger.info("应用初始化完成")
