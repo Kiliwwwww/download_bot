@@ -1,4 +1,6 @@
 from fastapi import APIRouter
+from pydantic import BaseModel
+
 from app.fast.service.download_service import clear_cache
 from app.fast.service.start_job_service import start_download
 from app.utils.logger_utils import logger
@@ -14,14 +16,19 @@ def read_root():
         data={"message": "Hello, FastAPI"}
     )
 
-
+class Item(BaseModel):
+    jm_comic_ids: str
 # 修改成异步任务 常用测试id = 422866
-@downloads_router.post("/{jm_comic_id}", response_model=StandardResponse[dict])
-def read_item(jm_comic_id: int):
+@downloads_router.post("/", response_model=StandardResponse[dict])
+def read_item(item: Item):
     try:
-        task = start_download(jm_comic_id)
+        task_ids = []
+        for item in item.jm_comic_ids.split(','):
+            jm_comic_id = int(item)
+            task = start_download(jm_comic_id)
+            task_ids.append(task.id)
         return StandardResponse(
-            data={"task_id": task.id}
+            data={"task_ids": task_ids}
         )
     except Exception as e:
         logger.error(f"创建任务失败: {str(e)}")
