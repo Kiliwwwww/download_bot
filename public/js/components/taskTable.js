@@ -15,7 +15,7 @@ export function createDownloadForm(Vue, naive) {
     template: `
     <div style="display: flex; justify-content: center; margin-top: 60px;">
       <n-card style="width: 500px; padding: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;">
-        <h2 style="text-align: center; margin-bottom: 25px; font-weight: 600; color: #333;">下载本子</h2>
+        <h2 style="text-align: center; margin-bottom: 25px; font-weight: 600; color: #333;">下载</h2>
         <n-space vertical size="large" style="width: 100%;">
 
           <!-- 输入框 -->
