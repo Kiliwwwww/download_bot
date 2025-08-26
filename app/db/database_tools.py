@@ -55,6 +55,15 @@ class Database:
             print(f"查询失败: {e}")
             return []
 
+    def query_one(self, sql, params=None):
+        """执行查询语句，返回单条结果（字典形式）"""
+        try:
+            self.cursor.execute(sql, params or [])
+            return self.cursor.fetchone()
+        except Exception as e:
+            print(f"查询失败: {e}")
+            return None
+
     def close(self):
         """关闭连接"""
         if self.cursor:
