@@ -63,16 +63,23 @@ class QuerySet:
         new_query = self.query.where(*(getattr(self.model, k) == v for k, v in kwargs.items()))
         return QuerySet(self.model, new_query)
 
-    def order_by_field(self, *fields):
+    def order(self, *fields):
         new_query = self.query.order_by(*fields)
         return QuerySet(self.model, new_query)
 
-    def limit_records(self, n):
+    def limit(self, n):
         new_query = self.query.limit(n)
         return QuerySet(self.model, new_query)
 
     def execute(self):
         return self.query.execute()
+
+    def first(self, only=None, exclude=None):
+        """返回单条记录"""
+        obj = self.query.first()
+        if obj:
+            return DBManager.to_dict(obj, only=only, exclude=exclude)
+        return None
 
     def to_dict(self, only=None, exclude=None):
         return [DBManager.to_dict(obj, only=only, exclude=exclude) for obj in self.query]
