@@ -23,7 +23,9 @@
 * 异步下载漫画
 * 自动打包为压缩包（zip）
 
-技术栈：**FastAPI + Celery + Honcho + Redis**
+后端技术栈：**FastAPI + Celery + Honcho + Redis**
+
+前端技术栈：**Vue3 + Naive-ui**
 
 ---
 
@@ -31,36 +33,44 @@
 
 ```
 jinman/
-├── app/                   # 应用主代码
-│   ├── celery/            # Celery 任务相关代码
-│   ├── fast/              # FastAPI 相关代码
-│   │   ├── controller/    # API 控制器，处理请求逻辑
-│   │   ├── router/        # 路由定义，注册 API endpoint
-│   │   ├── service/       # 核心业务逻辑服务层
-│   ├── init/              # 项目初始化工具及启动前检查
-│   ├── job/               # 定时任务或后台作业
-│   └── utils/             # 公共工具类，如日志、配置解析、文件处理
-├── books/                 # 漫画下载的源文件或缓存
-├── config/                # 配置文件
-│   ├── config.yml         # 服务器及缓存配置
-│   └── jm_downloader.yml  # JMComic 下载器配置
-├── logs/                  # 日志文件目录
-├── zip/                   # 下载漫画打包后的 zip 文件保存目录
-└── Procfile               # Honcho 启动配置文件
+├── app/                               # 核心业务逻辑和服务
+│   ├── celery/                        # Celery 相关任务处理
+│   │   ├── celery_worker.py           # Celery worker 启动文件
+│   │   └── task_manager.py            # 任务管理逻辑
+│   ├── fast/                          # FastAPI 相关模块
+│   │   ├── controller/                # 控制器层，处理请求逻辑
+│   │   │   ├── admin/                 # 管理员相关接口
+│   │   ├── router/                    # 路由配置
+│   │   ├── service/                   # 服务层，业务逻辑封装
+│   │   └── fast_app.py                # FastAPI 主程序入口
+│   ├── init/                           # 初始化相关模块
+│   ├── job/                            # 后台作业、定时任务
+│   └── utils/                          # 工具类、公共方法
+├── books/                              # 书籍或资源存储目录
+├── config/                             # 配置文件
+├── db/                                 # 数据库相关
+│   ├── migrations/                     # 数据库迁移脚本
+│   ├── database_tools.py               # 数据库工具类（连接、查询）
+│   ├── migration_checker.py            # 检测未执行迁移的工具
+│   └── migrator.py                     # 迁移执行器
+├── logs/                               # 日志文件存放目录
+│   └── logger.log
+├── public/                             # 静态文件目录
+│   ├── js/
+│   │   ├── api/                        # JS API 封装
+│   │   └── components/                 # 前端组件
+├── templates/                           # 前端模板文件（HTML）
+├── zip/                                 # ZIP 文件存放目录
+├── Procfile                             # 部署配置文件（Heroku 或类似环境）
+├── README.md                             # 项目说明文档
+├── app.sqlite                            # SQLite 数据库文件
+├── create_migration.py                   # 自动生成迁移脚本工具
+├── main.py                               # 项目启动入口
+├── migration_db.py                       # 数据库迁移脚本入口（可执行迁移）
+├── requirements.txt                      # Python 依赖列表
+
 ```
 
-> 各目录说明：
->
-> * **app/celery**：存放 Celery worker 和任务定义。
-> * **app/fast**：FastAPI 框架相关，分为路由、控制器和服务层，便于模块化开发。
-> * **app/init**：启动前初始化检查，例如目录创建、配置检查。
-> * **app/job**：定时任务或异步后台作业。
-> * **app/utils**：日志、YAML 解析、文件操作等工具。
-> * **books/**：漫画源文件存放目录。
-> * **config/**：项目运行所需配置文件。
-> * **logs/**：应用运行日志。
-> * **zip/**：打包好的漫画文件存放目录。
-> * **Procfile**：Honcho 启动服务定义，包括 web 和 worker。
 
 ---
 
