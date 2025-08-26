@@ -74,7 +74,9 @@ pip install -r requirements.txt
 
 # 复制配置文件
 cp config/config.yml.example config/config.yml
-cp config/jm_downloader.yml.example config/jm_downloader.yml 
+cp config/jm_downloader.yml.example config/jm_downloader.yml
+# 执行迁移任务
+python migration_db.py 
 ```
 
 ### 服务器启动
@@ -82,6 +84,14 @@ cp config/jm_downloader.yml.example config/jm_downloader.yml
 ```bash
 # 服务器启动
 honcho start
+```
+### 数据库说明
+```bash
+# 目前使用的是sqlite3作为内置数据库 以后有机会再改
+# 运行服务器前执行迁移任务
+python migration_db.py
+# 如果你要创建你定制的脚本 则执行 这个流程类似于rails的db任务
+python create_migration.py add_email_to_users
 ```
 
 ### 配置说明
