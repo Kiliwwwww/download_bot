@@ -8,7 +8,7 @@ export function createTaskTable(Vue, naive) {
     return {
         template: `
     <div style="display: flex; justify-content: center; margin-top: 50px;">
-      <n-card style="width: 900px; padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;" title="任务队列" size="huge" :bordered="false">
+      <n-card style="width: 1100px; padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;" title="任务队列" size="huge" :bordered="false">
         
         <!-- 顶部操作区 -->
         <n-space justify="space-between" align="center" style="margin-bottom: 20px;">
@@ -53,7 +53,7 @@ export function createTaskTable(Vue, naive) {
             const page = ref(1)
             const perPage = ref(10)
             const loading = ref(false)
-            const task_id_max_size = 8
+            const task_id_max_size = 6
 
             const showErrorModal = ref(false)
             const showIdModal = ref(false)
@@ -70,12 +70,17 @@ export function createTaskTable(Vue, naive) {
                 showIdModal.value = true
             }
 
+            const retryTask = (row) => {
+                alert('重试任务: ' + row.task_id)
+                // 这里可以调用你的重试接口
+            }
+
             const columns = [
                 {
                     title: '任务ID',
                     key: 'task_id',
                     render(row) {
-                        const shortText = row.task_id.length > task_id_max_size ? row.task_id.slice(0, task_id_max_size) + '...' : row.task_id
+                        const shortText = row.task_id.length > task_id_max_size ? row.task_id.slice(0, task_id_max_size)  : row.task_id
                         return h(
                             'span',
                             {
@@ -126,7 +131,7 @@ export function createTaskTable(Vue, naive) {
                     render(row) {
                         if (row.result && row.result.error) {
                             const text = row.result.error
-                            const shortText = text.length > 30 ? text.slice(0, 30) + '...' : text
+                            const shortText = text.length > 20 ? text.slice(0, 20) + '...' : text
                             return h('span', {
                                 style: {color: 'red', cursor: 'pointer', textDecoration: 'underline'},
                                 onClick: () => openErrorModal(text)
@@ -141,7 +146,25 @@ export function createTaskTable(Vue, naive) {
                         }
                         return null
                     }
+                },
+                {
+                    title: '操作',
+                    key: 'action',
+                    align: 'center', // 表头居中
+                    render(row) {
+                        // 只对失败任务显示重试按钮
+                        if (row.status !== 'SUCCESS') {
+                            return h(NButton, {
+                                type: 'text',        // 纯文字按钮
+                                size: 'small',       // 小尺寸
+                                style: {color: '#409EFF', cursor: 'pointer'}, // 蓝色文字，鼠标手型
+                                onClick: () => retryTask(row)
+                            }, '重试')
+                        }
+                        return null
+                    }
                 }
+
             ]
 
             const loadTasks = async () => {
