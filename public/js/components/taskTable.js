@@ -1,8 +1,8 @@
 import {fetchTasks} from '../api/taskService.js' // ✅ 使用相对路径，确保加载的是修改后的文件
 
 export function createTaskTable(Vue, naive) {
-    const { ref, h, computed } = Vue
-    const { NCard, NSpace, NButton, NText, NDataTable, NModal } = naive
+    const {ref, h, computed} = Vue
+    const {NCard, NSpace, NButton, NText, NDataTable, NModal} = naive
 
     return {
         template: `
@@ -68,7 +68,7 @@ export function createTaskTable(Vue, naive) {
                         return h(
                             'span',
                             {
-                                    onClick: () => openIdModal("任务ID:  "+row.task_id)
+                                onClick: () => openIdModal("任务ID:  " + row.task_id)
                             },
                             shortText
                         )
@@ -78,42 +78,48 @@ export function createTaskTable(Vue, naive) {
                     title: '状态',
                     key: 'status',
                     render(row) {
+                        let status = '失败'
+                        if(row.status === "SUCCESS"){
+                            status = '已结束'
+                        }else if(row.status === "RUNNING"){
+                            status = '进行中'
+                        }
                         return h(
                             'span',
-                            { style: { color: row.status === 'SUCCESS' ? 'green' : 'red' } },
-                            row.status === "SUCCESS" ? "已结束" : "失败"
+                            {style: {color: row.status === 'ERROR' ? 'red' : 'green'}},
+                            status
                         )
                     }
                 },
                 {
-                        title: '开始时间',
-                        key: 'start_time',
-                        render(row) {
-                            if (!row.start_time) return ''
-                            const start_time = new Date(row.start_time)
-                            // 格式化成 YYYY-MM-DD HH:mm:ss
-                            return start_time.getFullYear() + '-' +
-                                String(start_time.getMonth() + 1).padStart(2, '0') + '-' +
-                                String(start_time.getDate()).padStart(2, '0') + ' ' +
-                                String(start_time.getHours()).padStart(2, '0') + ':' +
-                                String(start_time.getMinutes()).padStart(2, '0') + ':' +
-                                String(start_time.getSeconds()).padStart(2, '0')
-                        }
+                    title: '开始时间',
+                    key: 'start_time',
+                    render(row) {
+                        if (!row.start_time) return ''
+                        const start_time = new Date(row.start_time)
+                        // 格式化成 YYYY-MM-DD HH:mm:ss
+                        return start_time.getFullYear() + '-' +
+                            String(start_time.getMonth() + 1).padStart(2, '0') + '-' +
+                            String(start_time.getDate()).padStart(2, '0') + ' ' +
+                            String(start_time.getHours()).padStart(2, '0') + ':' +
+                            String(start_time.getMinutes()).padStart(2, '0') + ':' +
+                            String(start_time.getSeconds()).padStart(2, '0')
+                    }
                 },
                 {
-                        title: '完成时间',
-                        key: 'end_time',
-                        render(row) {
-                            if (!row.end_time) return ''
-                            const end_time = new Date(row.end_time)
-                            // 格式化成 YYYY-MM-DD HH:mm:ss
-                            return end_time.getFullYear() + '-' +
-                                String(end_time.getMonth() + 1).padStart(2, '0') + '-' +
-                                String(end_time.getDate()).padStart(2, '0') + ' ' +
-                                String(end_time.getHours()).padStart(2, '0') + ':' +
-                                String(end_time.getMinutes()).padStart(2, '0') + ':' +
-                                String(end_time.getSeconds()).padStart(2, '0')
-                        }
+                    title: '完成时间',
+                    key: 'end_time',
+                    render(row) {
+                        if (!row.end_time) return ''
+                        const end_time = new Date(row.end_time)
+                        // 格式化成 YYYY-MM-DD HH:mm:ss
+                        return end_time.getFullYear() + '-' +
+                            String(end_time.getMonth() + 1).padStart(2, '0') + '-' +
+                            String(end_time.getDate()).padStart(2, '0') + ' ' +
+                            String(end_time.getHours()).padStart(2, '0') + ':' +
+                            String(end_time.getMinutes()).padStart(2, '0') + ':' +
+                            String(end_time.getSeconds()).padStart(2, '0')
+                    }
                 },
                 {
                     title: '结果',
@@ -125,14 +131,14 @@ export function createTaskTable(Vue, naive) {
                             return h(
                                 'span',
                                 {
-                                    style: { color: 'red', cursor: 'pointer', textDecoration: 'underline' },
+                                    style: {color: 'red', cursor: 'pointer', textDecoration: 'underline'},
                                     onClick: () => openErrorModal(text)
                                 },
                                 shortText
                             )
                         } else if (row.result && row.result.url) {
                             const fullUrl = window.location.origin + '/' + row.result.url
-                            return h('a', { href: fullUrl, target: '_blank' }, row.result.item_id || '查看')
+                            return h('a', {href: fullUrl, target: '_blank'}, row.result.item_id || '查看')
                         }
                         return null
                     }
@@ -186,6 +192,6 @@ export function createTaskTable(Vue, naive) {
                 currentError
             }
         },
-        components: { NCard, NSpace, NButton, NText, NDataTable, NModal }
+        components: {NCard, NSpace, NButton, NText, NDataTable, NModal}
     }
 }
