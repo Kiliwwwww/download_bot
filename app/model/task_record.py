@@ -4,11 +4,7 @@ from app.model.json_field import JSONField
 from db.db_manager import DBManager
 
 # 状态码
-status = {
-    'running': "RUNNING",
-    'success': "SUCCESS",
-    'failed': "FAILED"
-}
+
 TaskRecord = DBManager.model("task_records", {
     "id": IntegerField(primary_key=True),  # 主键，自增
     "task_id": CharField(null=False),  # 任务id，非空

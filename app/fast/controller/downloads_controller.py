@@ -1,13 +1,11 @@
-
 from fastapi import APIRouter
 from app.fast.service.download_service import clear_cache
+from app.fast.service.start_job_service import start_download
 from app.utils.logger_utils import logger
-from app.job.download_job import read_item as job
 
 from app.utils.standard_responese import StandardResponse
 
 downloads_router = APIRouter(prefix="/downloads", tags=["downloads"])
-
 
 
 @downloads_router.get("/", response_model=StandardResponse[dict])
@@ -21,7 +19,7 @@ def read_root():
 @downloads_router.post("/{jm_comic_id}", response_model=StandardResponse[dict])
 def read_item(jm_comic_id: int):
     try:
-        task = job.delay(jm_comic_id)
+        task = start_download(jm_comic_id)
         return StandardResponse(
             data={"task_id": task.id}
         )
@@ -46,4 +44,3 @@ def clear():
             code=500,
             message=f"清除缓存失败: {str(e)}"
         )
-

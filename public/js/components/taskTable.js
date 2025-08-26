@@ -1,4 +1,4 @@
-import { fetchTasks } from '../api/taskService.js'  // ✅ 使用相对路径，确保加载的是修改后的文件
+import {fetchTasks} from '../api/taskService.js' // ✅ 使用相对路径，确保加载的是修改后的文件
 
 export function createTaskTable(Vue, naive) {
     const { ref, h, computed } = Vue
@@ -86,19 +86,33 @@ export function createTaskTable(Vue, naive) {
                     }
                 },
                 {
-                        title: '完成时间',
-                        key: 'date_done',
+                        title: '开始时间',
+                        key: 'start_time',
                         render(row) {
-                            if (!row.date_done) return ''
-                            const date = new Date(row.date_done)
+                            if (!row.start_time) return ''
+                            const start_time = new Date(row.start_time)
                             // 格式化成 YYYY-MM-DD HH:mm:ss
-                            const formatted = date.getFullYear() + '-' +
-                                String(date.getMonth() + 1).padStart(2, '0') + '-' +
-                                String(date.getDate()).padStart(2, '0') + ' ' +
-                                String(date.getHours()).padStart(2, '0') + ':' +
-                                String(date.getMinutes()).padStart(2, '0') + ':' +
-                                String(date.getSeconds()).padStart(2, '0')
-                            return formatted
+                            return start_time.getFullYear() + '-' +
+                                String(start_time.getMonth() + 1).padStart(2, '0') + '-' +
+                                String(start_time.getDate()).padStart(2, '0') + ' ' +
+                                String(start_time.getHours()).padStart(2, '0') + ':' +
+                                String(start_time.getMinutes()).padStart(2, '0') + ':' +
+                                String(start_time.getSeconds()).padStart(2, '0')
+                        }
+                },
+                {
+                        title: '完成时间',
+                        key: 'end_time',
+                        render(row) {
+                            if (!row.end_time) return ''
+                            const end_time = new Date(row.end_time)
+                            // 格式化成 YYYY-MM-DD HH:mm:ss
+                            return end_time.getFullYear() + '-' +
+                                String(end_time.getMonth() + 1).padStart(2, '0') + '-' +
+                                String(end_time.getDate()).padStart(2, '0') + ' ' +
+                                String(end_time.getHours()).padStart(2, '0') + ':' +
+                                String(end_time.getMinutes()).padStart(2, '0') + ':' +
+                                String(end_time.getSeconds()).padStart(2, '0')
                         }
                 },
                 {

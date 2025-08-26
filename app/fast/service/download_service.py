@@ -1,10 +1,15 @@
+
 from app.utils.jm_downloader import *
 from app.utils.logger_utils import logger
 from app.utils.yaml_config import config, jm_downloader
+
 import os
 import shutil
 from app.utils.redis_utils import RedisUtils, JM_KEY
+
 redis_util = RedisUtils()
+
+
 
 
 # 下载jinman文件
@@ -58,9 +63,6 @@ def clear_cache():
         print(f"已创建空的books目录: {books_dir}")
     except Exception as e:
         print(f"创建books目录 {books_dir} 时出错: {str(e)}")
-
-
-
 
 
 def correspond_to(jm_id: int):

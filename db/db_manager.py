@@ -1,5 +1,7 @@
 from peewee import Model, SqliteDatabase
 import os
+
+from app.utils.logger_utils import logger
 from app.utils.yaml_config import config
 
 
@@ -84,6 +86,13 @@ class QuerySet:
     def to_dict(self, only=None, exclude=None):
         return [DBManager.to_dict(obj, only=only, exclude=exclude) for obj in self.query]
 
+    def sql(self, pretty: bool = True):
+        """打印或返回 SQL 语句"""
+        sql, params = self.query.sql()
+        if pretty:
+            # 格式化输出（带参数）
+            str = "SQL:", sql % tuple(repr(p) for p in params)
+            logger.info(str)
 
 class BaseModel(Model):
     class Meta:
@@ -100,8 +109,8 @@ class BaseModel(Model):
 
     @classmethod
     def update_record(cls, filters, **kwargs):
-        return cls.update(**kwargs).where(*(getattr(cls, k) == v for k, v in filters.items()))
+        return cls.update(**kwargs).where(*(getattr(cls, k) == v for k, v in filters.items())).execute()
 
     @classmethod
     def delete_record(cls, **filters):
-        return cls.delete().where(*(getattr(cls, k) == v for k, v in filters.items()))
+        return cls.delete().where(*(getattr(cls, k) == v for k, v in filters.items())).execute()
