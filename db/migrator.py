@@ -7,7 +7,7 @@ from app.utils.yaml_config import config
 class Migrator:
     def __init__(self):
         # 从配置里拿 sqlite 数据库路径
-        db_path = config.get("database.sqlite.database", "db/database.db")
+        db_path = config.get("database.sqlite.database", "app.sqlite")
         self.conn = sqlite3.connect(db_path)
         self.cursor = self.conn.cursor()
         self.migrations_dir = os.path.join(os.path.dirname(__file__), "migrations")
