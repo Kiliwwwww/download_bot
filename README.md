@@ -109,7 +109,7 @@ python migration_db.py
 # 如果你要创建你定制的脚本 则执行 这个流程类似于rails的db任务
 python create_migration.py add_email_to_users
 ```
-
+create_migration命令使用说明: [create_migration.md](md/create_migration.md)
 ### 配置说明
 
 * **Redis 配置**
