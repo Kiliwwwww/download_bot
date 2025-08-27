@@ -10,7 +10,7 @@ export function createDownloadForm(Vue, naive) {
         <div style="display: flex; justify-content: center; gap: 30px; margin-top: 200px;">
           <!-- 左侧图片 -->
           <img
-            src="/public/logo.webp"
+            src="/public/img/logo.webp"
             alt="logo"
             style="width: 260px; height: 340px; object-fit: cover; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); transition: transform 0.3s;"
             @mouseover="hoverImg = true"
@@ -50,11 +50,15 @@ export function createDownloadForm(Vue, naive) {
                     v-for="(id, index) in savedIds"
                     :key="id"
                     closable
-                    type="success"
+                    :color="{ color: '#fff', borderColor: '#ff7eb9', textColor: '#ff7eb9' }"
                     style="padding: 4px 10px; border-radius: 6px;"
-                    @close="removeId(index)"
-                  >
-                    {{ id }}
+                    @close="removeId(index)">
+                    <template #avatar>
+                    <n-avatar
+                      src="/public/img/book.png"
+                    />
+                  </template>
+                  {{ id }}
                   </n-tag>
                 </div>
 
