@@ -91,7 +91,7 @@ export function createDownloadForm(Vue, naive) {
              局限性: 只能用禁漫天堂地址上的数字id下载<br>
              如果大家觉得好用的话就请麻烦宣传和赞助一下！<br>
              毕竟目前服务器费用非常昂贵<br>
-             PS.目前只收录了禁漫天堂内的本子哦！别的网站的暂时未收录<br>
+             PS.目前只能下载禁漫天堂内的本子哦！别的网站的暂时未收录<br>
              <a href="/admins/pages" style="font-weight: 500;">前往历史记录 →</a><br>
    
            </p>
