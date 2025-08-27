@@ -1,5 +1,6 @@
 import {downloadById} from '../api/downloadService.js'
-import { themeOverrides } from '../utils/theme.js'
+import {themeOverrides} from '../utils/theme.js'
+
 export function createDownloadForm(Vue, naive) {
     const {ref, computed} = Vue
     const {NCard, NInput, NButton, NSpace, NTag, useMessage, NConfigProvider} = naive
@@ -42,6 +43,8 @@ export function createDownloadForm(Vue, naive) {
                   v-model:value="inputId"
                   placeholder="请输入ID，按回车保存"
                   @keyup.enter="handleEnter"
+                  @blur="handleEnter"
+                  @input="filterNumber" 
                   style="width: 80%; font-size: 15px; border-radius: 8px; padding: 8px 12px;"
                 ></n-input>
 
@@ -145,7 +148,7 @@ export function createDownloadForm(Vue, naive) {
 
             const cardStyle = computed(() => ({
                 width: '500px',
-                height: '340px',
+                minHeight: '340px',
                 padding: '20px',
                 borderRadius: '12px',
                 backgroundColor: '#fff',
@@ -156,6 +159,10 @@ export function createDownloadForm(Vue, naive) {
                 transition: 'all 0.3s ease'
             }))
 
+            const filterNumber = (value) => {
+                // 只保留数字
+                inputId.value = value.replace(/\D/g, '')
+            }
             return {
                 inputId,
                 savedIds,
@@ -165,7 +172,8 @@ export function createDownloadForm(Vue, naive) {
                 removeId,
                 handleDownload,
                 cardStyle,
-                themeOverrides
+                themeOverrides,
+                filterNumber
             }
         },
         components: {NCard, NInput, NButton, NSpace, NTag, NConfigProvider}
