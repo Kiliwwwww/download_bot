@@ -7,45 +7,47 @@ export function createTaskTable(Vue, naive) {
 
     return {
         template: `
-    <div style="display: flex; justify-content: center; margin-top: 50px;">
-      <n-card style="width: 1100px; padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;" title="任务队列" size="huge" :bordered="false">
-        
-        <!-- 顶部操作区 -->
-        <n-space justify="space-between" align="center" style="margin-bottom: 20px;">
-          <div style="display: flex; gap: 12px;">
-            <n-button type="primary" size="medium" @click="openDownloadPage">下载</n-button>
-            <n-button type="primary" size="medium" :loading="loading" @click="loadTasks">刷新</n-button>
-          </div>
-          <n-text depth="3">共 {{ total }} 个任务</n-text>
-        </n-space>
-
-        <!-- 数据表 -->
-        <n-data-table
-          :columns="columns"
-          :data="tasks"
-          :bordered="true"
-          :single-line="false"
-          :pagination="pagination"
-          :loading="loading"
-          size="medium"
-          style="border-radius: 8px;"
-        ></n-data-table>
-
-        <!-- 弹窗: 错误详情 -->
-        <n-modal v-model:show="showErrorModal" preset="dialog" title="错误详情" style="max-width: 500px;">
-          <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap; padding: 10px; line-height: 1.5; color: #333;">
-            {{ currentError }}
-          </div>
-        </n-modal>
-
-        <!-- 弹窗: 任务ID详情 -->
-        <n-modal v-model:show="showIdModal" preset="dialog" title="详情" style="max-width: 500px;">
-          <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap; padding: 10px; line-height: 1.5; color: #333;">
-            {{ currentId }}
-          </div>
-        </n-modal>
-      </n-card>
-    </div>
+    <n-config-provider :theme-overrides="themeOverrides">
+        <div style="display: flex; justify-content: center; margin-top: 50px;">
+          <n-card style="width: 1100px; padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;" title="任务队列" size="huge" :bordered="false">
+            
+            <!-- 顶部操作区 -->
+            <n-space justify="space-between" align="center" style="margin-bottom: 20px;">
+              <div style="display: flex; gap: 12px;">
+                <n-button type="primary" size="medium" @click="openDownloadPage">下载</n-button>
+                <n-button type="primary" size="medium" :loading="loading" @click="loadTasks">刷新</n-button>
+              </div>
+              <n-text depth="3">共 {{ total }} 个任务</n-text>
+            </n-space>
+    
+            <!-- 数据表 -->
+            <n-data-table
+              :columns="columns"
+              :data="tasks"
+              :bordered="true"
+              :single-line="false"
+              :pagination="pagination"
+              :loading="loading"
+              size="medium"
+              style="border-radius: 8px;"
+            ></n-data-table>
+    
+            <!-- 弹窗: 错误详情 -->
+            <n-modal v-model:show="showErrorModal" preset="dialog" title="错误详情" style="max-width: 500px;">
+              <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap; padding: 10px; line-height: 1.5; color: #333;">
+                {{ currentError }}
+              </div>
+            </n-modal>
+    
+            <!-- 弹窗: 任务ID详情 -->
+            <n-modal v-model:show="showIdModal" preset="dialog" title="详情" style="max-width: 500px;">
+              <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap; padding: 10px; line-height: 1.5; color: #333;">
+                {{ currentId }}
+              </div>
+            </n-modal>
+          </n-card>
+        </div>
+    </n-config-provider>
     `,
         setup() {
             const tasks = ref([])
@@ -60,6 +62,14 @@ export function createTaskTable(Vue, naive) {
             const currentError = ref('')
             const currentId = ref('')
 
+            const themeOverrides = {
+                common: {
+                    primaryColor: '#ff7eb9',        // 全局主题色改成粉色
+                    primaryColorHover: '#ff6aa1',
+                    primaryColorPressed: '#ff5890',
+                    primaryColorSuppl: '#ffd6e8'
+                }
+            }
             const openErrorModal = (msg) => {
                 currentError.value = msg
                 showErrorModal.value = true
@@ -84,7 +94,7 @@ export function createTaskTable(Vue, naive) {
                         return h(
                             'span',
                             {
-                                style: {cursor: 'pointer', color: '#409EFF'},
+                                style: {cursor: 'pointer', color: '#ff7eb9'},
                                 onClick: () => openIdModal('任务ID:  ' + row.task_id)
                             },
                             shortText
@@ -98,8 +108,8 @@ export function createTaskTable(Vue, naive) {
                         let status = '失败'
                         let color = 'red'
                         if (row.status === 'SUCCESS') {
-                            status = '已结束'
-                            color = 'green'
+                            status = '已完成'
+                            color = '#ff7eb9'
                         } else if (row.status === 'RUNNING') {
                             status = '进行中'
                             color = '#409EFF'
@@ -209,7 +219,8 @@ export function createTaskTable(Vue, naive) {
                 showErrorModal,
                 showIdModal,
                 currentId,
-                currentError
+                currentError,
+                themeOverrides
             }
         },
         components: {NCard, NSpace, NButton, NText, NDataTable, NModal}

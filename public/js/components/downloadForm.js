@@ -1,120 +1,92 @@
-// downloadForm.js
 import {downloadById} from '../api/downloadService.js'
 
 export function createDownloadForm(Vue, naive) {
     const {ref, computed} = Vue
-    const {NCard, NInput, NButton, NSpace, NTag, useMessage} = naive
+    const {NCard, NInput, NButton, NSpace, NTag, useMessage, NConfigProvider} = naive
 
     return {
         template: `
-    <div style="display: flex; justify-content: center; gap: 30px; margin-top: 200px;">
-    
-      <!-- 左侧图片 -->
-      <img
-        src="/public/logo.png"
-        alt="logo"
-        style="width: 260px; height: 340px; object-fit: cover; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); transition: transform 0.3s;"
-        @mouseover="hoverImg = true"
-        @mouseleave="hoverImg = false"
-        :style="{ transform: hoverImg ? 'scale(1.03)' : 'scale(1)' }"
-      />
-    
-      <!-- 右侧容器（Card + Link） -->
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
-    
-        <!-- Card -->
-        <!-- Card 内部 -->
-        <n-card 
-  :style="cardStyle"
-  @mouseover="hoverCard = true"
-  @mouseleave="hoverCard = false"
->
-  <!-- 垂直居中容器 -->
-  <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%;">
+      <n-config-provider :theme-overrides="themeOverrides">
+        <div style="display: flex; justify-content: center; gap: 30px; margin-top: 200px;">
+          <!-- 左侧图片 -->
+          <img
+            src="/public/logo.png"
+            alt="logo"
+            style="width: 260px; height: 340px; object-fit: cover; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); transition: transform 0.3s;"
+            @mouseover="hoverImg = true"
+            @mouseleave="hoverImg = false"
+            :style="{ transform: hoverImg ? 'scale(1.03)' : 'scale(1)' }"
+          />
 
-    <!-- 标题 -->
-    <h2 style="
-      font-weight: 800;
-      font-size: 26px;
-      background: linear-gradient(90deg, #ff7eb9, #ff758c);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-align: center;
-      margin-bottom: 10px;
-    ">
-      下载bot酱
-    </h2>
+          <!-- 右侧容器 -->
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            <n-card 
+              :style="cardStyle"
+              @mouseover="hoverCard = true"
+              @mouseleave="hoverCard = false"
+            >
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%;">
+                <h2 style="
+                  font-weight: 800;
+                  font-size: 26px;
+                  background: linear-gradient(90deg, #ff7eb9, #ff758c);
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  text-align: center;
+                  margin-bottom: 10px;
+                ">
+                  下载bot酱
+                </h2>
 
-    <!-- 输入框 -->
-    <n-input
-      v-model:value="inputId"
-      placeholder="请输入ID，按回车保存"
-      @keyup.enter="handleEnter"
-      style="
-        width: 80%;
-        font-size: 15px;
-        border-radius: 8px;
-        border: 1px solid #dcdfe6;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-        padding: 8px 12px;
-        transition: all 0.3s;
-      "
-      @mouseover="hoverInput = true"
-      @mouseleave="hoverInput = false"
-      :style="{ borderColor: hoverInput ? '#409eff' : '#dcdfe6', boxShadow: hoverInput ? '0 0 5px rgba(64,158,255,0.3)' : 'inset 0 2px 4px rgba(0,0,0,0.05)'}"
-    ></n-input>
+                <n-input
+                  v-model:value="inputId"
+                  placeholder="请输入ID，按回车保存"
+                  @keyup.enter="handleEnter"
+                  style="width: 80%; font-size: 15px; border-radius: 8px; padding: 8px 12px;"
+                ></n-input>
 
-    <!-- 已保存的 ID 标签 -->
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%;">
-      <n-tag
-        v-for="(id, index) in savedIds"
-        :key="id"
-        closable
-        type="success"
-        style="padding: 4px 10px; border-radius: 6px;"
-        @close="removeId(index)"
-      >
-        {{ id }}
-      </n-tag>
-    </div>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%;">
+                  <n-tag
+                    v-for="(id, index) in savedIds"
+                    :key="id"
+                    closable
+                    type="success"
+                    style="padding: 4px 10px; border-radius: 6px;"
+                    @close="removeId(index)"
+                  >
+                    {{ id }}
+                  </n-tag>
+                </div>
 
-    <!-- 下载按钮 -->
-    <n-button
-      size="medium"
-      @click="handleDownload"
-      style="
-        min-width: 140px;
-        padding: 10px 20px;
-        font-weight: 600;
-        font-size: 15px;
-        color: #fff;
-        border-radius: 10px;
-        background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-      "
-      @mouseover="hoverBtn = true"
-      @mouseleave="hoverBtn = false"
-      :style="{ transform: hoverBtn ? 'scale(1.05)' : 'scale(1)', boxShadow: hoverBtn ? '0 8px 18px rgba(0,0,0,0.25)' : '0 6px 12px rgba(0,0,0,0.15)' }"
-    >
-      开始下载 🎉
-    </n-button>
+                 <n-button
+                  size="medium"
+                  @click="handleDownload"
+                  style="
+                    min-width: 140px;
+                    padding: 10px 20px;
+                    font-weight: 600;
+                    font-size: 15px;
+                    color: #fff;
+                    border-radius: 10px;
+                    background: linear-gradient(90deg, #ff7eb9 0%, #ff758c 100%);
+                    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+                    transition: all 0.3s ease;
+                    border: none;
+                    cursor: pointer;
+                  "
+                  @mouseover="hoverBtn = true"
+                  @mouseleave="hoverBtn = false"
+                  :style="{ transform: hoverBtn ? 'scale(1.05)' : 'scale(1)', boxShadow: hoverBtn ? '0 8px 18px rgba(0,0,0,0.25)' : '0 6px 12px rgba(0,0,0,0.15)' }"
+                >
+                  开始下载 🎉
+                </n-button>
+              </div>
+            </n-card>
 
-  </div>
-</n-card>
-
-
-
-    
-        <!-- Card 外部 link -->
-        <a href="/admins/pages" style="color: #409eff; text-decoration: none; font-weight: 500;">前往历史记录 →</a>
-    
-      </div>
-    </div>
-
-
+            <a href="/admins/pages" style="font-weight: 500;">前往历史记录 →</a>
+          </div>
+        </div>
+      </n-config-provider>
     `,
         setup() {
             const inputId = ref('')
@@ -122,6 +94,15 @@ export function createDownloadForm(Vue, naive) {
             const hoverImg = ref(false)
             const hoverCard = ref(false)
             const message = useMessage()
+
+            const themeOverrides = {
+                common: {
+                    primaryColor: '#ff7eb9',        // 全局主题色改成粉色
+                    primaryColorHover: '#ff6aa1',
+                    primaryColorPressed: '#ff5890',
+                    primaryColorSuppl: '#ffd6e8'
+                }
+            }
 
             const handleEnter = () => {
                 const id = inputId.value.trim()
@@ -168,9 +149,18 @@ export function createDownloadForm(Vue, naive) {
                 transition: 'all 0.3s ease'
             }))
 
-
-            return {inputId, savedIds, hoverImg, hoverCard, handleEnter, removeId, handleDownload, cardStyle}
+            return {
+                inputId,
+                savedIds,
+                hoverImg,
+                hoverCard,
+                handleEnter,
+                removeId,
+                handleDownload,
+                cardStyle,
+                themeOverrides
+            }
         },
-        components: {NCard, NInput, NButton, NSpace, NTag}
+        components: {NCard, NInput, NButton, NSpace, NTag, NConfigProvider}
     }
 }
