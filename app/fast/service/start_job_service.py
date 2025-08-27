@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from app.job.download_job import read_item as job
+from app.job.download_job import read_item as job, retry_item as retry_job
 from app.model.task_record import TaskRecord
+from app.utils.logger_utils import logger
 
 
 def start_download(jm_comic_id: int):
@@ -16,3 +17,14 @@ def start_download(jm_comic_id: int):
                              },
                              user_id=1)
     return task
+
+
+# 重试
+def retry_download(task_id: str):
+    data = TaskRecord.objects().where(task_id=task_id).first()
+    if data and data["result"] and data["result"]["item_id"]:
+        item = data["result"]["item_id"]
+        retry_job.delay(jm_comic_id=item,task_id=task_id)
+    else:
+        logger.info("没有找到数据")
+    return str

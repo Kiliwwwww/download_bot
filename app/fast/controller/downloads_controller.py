@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 from app.fast.service.download_service import clear_cache
-from app.fast.service.start_job_service import start_download
+from app.fast.service.start_job_service import start_download, retry_download
 from app.utils.logger_utils import logger
 
 from app.utils.standard_responese import StandardResponse
@@ -18,6 +18,10 @@ def read_root():
 
 class Item(BaseModel):
     jm_comic_ids: list
+
+class RetryItem(BaseModel):
+    task_ids: list
+
 # 修改成异步任务 常用测试id = 422866
 @downloads_router.post("/", response_model=StandardResponse[dict])
 def read_item(item: Item):
@@ -27,6 +31,25 @@ def read_item(item: Item):
             jm_comic_id = int(item)
             task = start_download(jm_comic_id)
             task_ids.append(task.id)
+        return StandardResponse(
+            data={"task_ids": task_ids}
+        )
+    except Exception as e:
+        logger.error(f"创建任务失败: {str(e)}")
+        return StandardResponse(
+            code=500,
+            message=f"创建任务失败: {str(e)}"
+        )
+
+# 重试下载
+@downloads_router.post("/retry", response_model=StandardResponse[dict])
+def retry(item: RetryItem):
+    try:
+        task_ids = []
+        for item in item.task_ids:
+
+            retry_download(item)
+            task_ids.append(item)
         return StandardResponse(
             data={"task_ids": task_ids}
         )

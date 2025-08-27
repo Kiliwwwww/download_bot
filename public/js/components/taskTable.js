@@ -1,10 +1,11 @@
 // taskTable.js
 import {fetchTasks} from '../api/taskService.js'
 import {themeOverrides} from '../utils/theme.js'
+import {retryById} from '../api/retryService.js'
 
 export function createTaskTable(Vue, naive) {
     const {ref, h} = Vue
-    const {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination} = naive
+    const {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, useMessage} = naive
 
     return {
         template: `
@@ -75,7 +76,7 @@ export function createTaskTable(Vue, naive) {
             const showIdModal = ref(false)
             const currentError = ref('')
             const currentId = ref('')
-
+            const message = useMessage()
             const openErrorModal = (msg) => {
                 currentError.value = msg
                 showErrorModal.value = true
@@ -86,8 +87,16 @@ export function createTaskTable(Vue, naive) {
                 showIdModal.value = true
             }
 
-            const retryTask = (row) => {
-                alert('重试任务: ' + row.task_id)
+            const retryTask = async (row) => {
+                message.info('下载任务重新进入队列')
+                const res = await retryById(row.task_id)
+                if (res.code === 200) {
+                    setTimeout(() => {
+                        window.location.href = '/admins/pages'
+                    }, 1000)
+                } else {
+                    message.error(res.message || '重试任务失败')
+                }
             }
 
             const columns = [

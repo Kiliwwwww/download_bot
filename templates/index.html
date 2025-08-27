@@ -41,10 +41,13 @@
 </footer>
 <script type="module">
     import {createTaskTable} from '../../public/js/components/taskTable.js'
-
+    const {NMessageProvider} = naive
     const app = Vue.createApp({
         template: `
-          <task-table/>`,
+          <n-message-provider>
+            <task-table/>
+          </n-message-provider>
+          `,
         components: {
             'task-table': createTaskTable(Vue, naive)
         }
