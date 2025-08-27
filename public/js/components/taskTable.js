@@ -1,52 +1,66 @@
 // taskTable.js
 import {fetchTasks} from '../api/taskService.js'
-import { themeOverrides } from '../utils/theme.js'
+import {themeOverrides} from '../utils/theme.js'
+
 export function createTaskTable(Vue, naive) {
-    const {ref, h, computed} = Vue
-    const {NCard, NSpace, NButton, NText, NDataTable, NModal} = naive
+    const {ref, h} = Vue
+    const {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination} = naive
 
     return {
         template: `
     <n-config-provider :theme-overrides="themeOverrides">
-        <div style="display: flex; justify-content: center; margin-top: 50px;">
-          <n-card style="width: 1100px; padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;" title="任务队列" size="huge" :bordered="false">
-            
-            <!-- 顶部操作区 -->
-            <n-space justify="space-between" align="center" style="margin-bottom: 20px;">
-              <div style="display: flex; gap: 12px;">
-                <n-button type="primary" size="medium" @click="openDownloadPage">返回下载</n-button>
-                <n-button type="primary" size="medium" :loading="loading" @click="loadTasks">刷新</n-button>
-              </div>
-              <n-text depth="3">共 {{ total }} 个任务</n-text>
-            </n-space>
-    
-            <!-- 数据表 -->
-            <n-data-table
-              :columns="columns"
-              :data="tasks"
-              :bordered="true"
-              :single-line="false"
-              :pagination="pagination"
-              :loading="loading"
-              size="medium"
-              style="border-radius: 8px;"
-            ></n-data-table>
-    
-            <!-- 弹窗: 错误详情 -->
-            <n-modal v-model:show="showErrorModal" preset="dialog" title="错误详情" style="max-width: 500px;">
-              <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap; padding: 10px; line-height: 1.5; color: #333;">
-                {{ currentError }}
-              </div>
-            </n-modal>
-    
-            <!-- 弹窗: 任务ID详情 -->
-            <n-modal v-model:show="showIdModal" preset="dialog" title="详情" style="max-width: 500px;">
-              <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap; padding: 10px; line-height: 1.5; color: #333;">
-                {{ currentId }}
-              </div>
-            </n-modal>
-          </n-card>
-        </div>
+      <div style="display: flex; justify-content: center; margin-top: 50px;">
+        <n-card style="width: 1100px; padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;" 
+                title="任务队列" size="huge" :bordered="false">
+          
+          <!-- 顶部操作区 -->
+          <n-space justify="space-between" align="center" style="margin-bottom: 20px;">
+            <div style="display: flex; gap: 12px;">
+              <n-button type="primary" size="medium" @click="openDownloadPage">返回下载</n-button>
+              <n-button type="primary" size="medium" :loading="loading" @click="loadTasks">刷新</n-button>
+            </div>
+            <n-text depth="3">共 {{ total }} 个任务</n-text>
+          </n-space>
+  
+          <!-- 数据表 -->
+          <n-data-table
+            :columns="columns"
+            :data="tasks"
+            :bordered="true"
+            :single-line="false"
+            :loading="loading"
+            size="medium"
+            style="border-radius: 8px;"
+          ></n-data-table>
+
+          <!-- 单独分页 -->
+          <div style="display:flex; justify-content:right; margin-top: 20px;">
+            <n-pagination
+              v-model:page="page"
+              v-model:page-size="perPage"
+              :item-count="total"
+              show-size-picker
+              :page-sizes="[10, 20, 50, 100]"
+              @update:page="loadTasks"
+              @update:page-size="(size) => { perPage = size; page = 1; loadTasks(); }"
+            />
+          </div>
+  
+          <!-- 弹窗: 错误详情 -->
+          <n-modal v-model:show="showErrorModal" preset="dialog" title="错误详情" style="max-width: 500px;">
+            <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap; padding: 10px; line-height: 1.5; color: #333;">
+              {{ currentError }}
+            </div>
+          </n-modal>
+  
+          <!-- 弹窗: 任务ID详情 -->
+          <n-modal v-model:show="showIdModal" preset="dialog" title="详情" style="max-width: 500px;">
+            <div style="max-height: 400px; overflow-y: auto; white-space: pre-wrap; padding: 10px; line-height: 1.5; color: #333;">
+              {{ currentId }}
+            </div>
+          </n-modal>
+        </n-card>
+      </div>
     </n-config-provider>
     `,
         setup() {
@@ -62,7 +76,6 @@ export function createTaskTable(Vue, naive) {
             const currentError = ref('')
             const currentId = ref('')
 
-
             const openErrorModal = (msg) => {
                 currentError.value = msg
                 showErrorModal.value = true
@@ -75,7 +88,6 @@ export function createTaskTable(Vue, naive) {
 
             const retryTask = (row) => {
                 alert('重试任务: ' + row.task_id)
-                // 这里可以调用你的重试接口
             }
 
             const columns = [
@@ -83,15 +95,11 @@ export function createTaskTable(Vue, naive) {
                     title: '任务ID',
                     key: 'task_id',
                     render(row) {
-                        const shortText = row.task_id.length > task_id_max_size ? row.task_id.slice(0, task_id_max_size)  : row.task_id
-                        return h(
-                            'span',
-                            {
-                                style: {cursor: 'pointer', color: '#ff7eb9'},
-                                onClick: () => openIdModal('任务ID:  ' + row.task_id)
-                            },
-                            shortText
-                        )
+                        const shortText = row.task_id.length > task_id_max_size ? row.task_id.slice(0, task_id_max_size) : row.task_id
+                        return h('span', {
+                            style: {cursor: 'pointer', color: '#ff7eb9'},
+                            onClick: () => openIdModal('任务ID:  ' + row.task_id)
+                        }, shortText)
                     }
                 },
                 {
@@ -153,47 +161,37 @@ export function createTaskTable(Vue, naive) {
                 {
                     title: '操作',
                     key: 'action',
-                    align: 'center', // 表头居中
+                    align: 'center',
                     render(row) {
-                        // 只对失败任务显示重试按钮
                         if (row.status !== 'SUCCESS') {
                             return h(NButton, {
-                                type: 'text',        // 纯文字按钮
-                                size: 'small',       // 小尺寸
-                                style: {color: '#409EFF', cursor: 'pointer'}, // 蓝色文字，鼠标手型
+                                type: 'text',
+                                size: 'small',
+                                style: {color: '#409EFF', cursor: 'pointer'},
                                 onClick: () => retryTask(row)
                             }, '重试')
                         }
                         return null
                     }
                 }
-
             ]
 
             const loadTasks = async () => {
                 loading.value = true
-                const res = await fetchTasks(page.value, perPage.value)
-                tasks.value = res.items || []
-                total.value = res.total || 0
-                loading.value = false
-            }
+                try {
+                    const res = await fetchTasks(page.value, perPage.value)
+                    const data = res.data || res
 
-            const pagination = computed(() => ({
-                page: page.value,
-                pageSize: perPage.value,
-                itemCount: total.value,
-                showSizePicker: true,
-                pageSizes: [10, 20, 50],
-                onChange: (newPage) => {
-                    page.value = newPage
-                    loadTasks()
-                },
-                onUpdatePageSize: (newSize) => {
-                    perPage.value = newSize
-                    page.value = 1
-                    loadTasks()
+                    tasks.value = data.items || []
+                    total.value = data.total || 0
+                } catch (err) {
+                    console.error('加载任务失败', err)
+                    tasks.value = []
+                    total.value = 0
+                } finally {
+                    loading.value = false
                 }
-            }))
+            }
 
             const openDownloadPage = () => {
                 window.location.href = '/admins/pages/download.html'
@@ -204,9 +202,10 @@ export function createTaskTable(Vue, naive) {
             return {
                 tasks,
                 total,
+                page,
+                perPage,
                 loading,
                 columns,
-                pagination,
                 loadTasks,
                 openDownloadPage,
                 showErrorModal,
@@ -216,6 +215,6 @@ export function createTaskTable(Vue, naive) {
                 themeOverrides
             }
         },
-        components: {NCard, NSpace, NButton, NText, NDataTable, NModal}
+        components: {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination}
     }
 }
