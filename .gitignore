@@ -41,7 +41,7 @@ build/
 books/
 zip/
 logs/
-
+Procfile
 # Mac 系统文件
 .DS_Store
 .AppleDouble

@@ -12,4 +12,4 @@ database:
 #    database: test
 #    port: 3306
   sqlite:
-    database: app.db
+    database: app.sqlite

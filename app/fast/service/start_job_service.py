@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app.job import read_item
+from app.task.download_task import download_item
 from app.model.task_record import TaskRecord
 from app.rq.rq_utils import RQManager
 from app.utils.logger_utils import logger
@@ -8,10 +8,9 @@ rq_manager = RQManager()
 
 def start_download(jm_comic_id: int):
     logger.info(f"jm_comic_id: {jm_comic_id}")
-    # task = job.delay(int(jm_comic_id))
-    rq_manager.enqueue(read_item, jm_comic_id)
-    task = {"id" : jm_comic_id}
-    TaskRecord.create_record(task_id=task.id,
+    rq = rq_manager.enqueue(download_item, jm_comic_id)
+    task_id = rq.id
+    TaskRecord.create_record(task_id=task_id,
                              end_time=datetime.now(),
                              start_time=datetime.now(),
                              status="RUNNING",
@@ -20,7 +19,7 @@ def start_download(jm_comic_id: int):
                                  "url": ""
                              },
                              user_id=1)
-    return task
+    return task_id
 
 
 # 重试
