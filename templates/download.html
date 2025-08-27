@@ -32,6 +32,30 @@
             font-size: 14px;
             padding: 10px 0;
         }
+
+        .shake {
+            animation: shake 0.2s ease-in-out infinite;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-3px);
+            }
+            50% {
+                transform: translateX(3px);
+            }
+            75% {
+                transform: translateX(-3px);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+
     </style>
 </head>
 <body>
@@ -48,10 +72,12 @@
     const {NMessageProvider} = naive
 
     const App = {
-        template: `
-          <n-message-provider>
-            <download-form/>
-          </n-message-provider>`,
+        template:
+          `
+            <n-message-provider>
+              <download-form/>
+            </n-message-provider>
+          `,
         components: {
             'download-form': createDownloadForm(Vue, naive),
             NMessageProvider
