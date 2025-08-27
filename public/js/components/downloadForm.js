@@ -54,8 +54,8 @@ export function createDownloadForm(Vue, naive) {
                     style="padding: 4px 10px; border-radius: 6px;"
                     @close="removeId(index)">
                     <template #avatar>
-                    <n-avatar
-                      src="/public/img/book.png"
+                    <n-avatar color="transparent"
+                      src="/public/img/book.svg"
                     />
                   </template>
                   {{ id }}
