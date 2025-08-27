@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from app.job.download_job import read_item as job, retry_item as retry_job
+from app.job.download_job import read_item as job
+from app.job.retry_job import retry_item as retry_job
 from app.model.task_record import TaskRecord
 from app.utils.logger_utils import logger
 
