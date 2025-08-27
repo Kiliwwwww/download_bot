@@ -1,5 +1,5 @@
 import {downloadById} from '../api/downloadService.js'
-
+import { themeOverrides } from '../utils/theme.js'
 export function createDownloadForm(Vue, naive) {
     const {ref, computed} = Vue
     const {NCard, NInput, NButton, NSpace, NTag, useMessage, NConfigProvider} = naive
@@ -10,7 +10,7 @@ export function createDownloadForm(Vue, naive) {
         <div style="display: flex; justify-content: center; gap: 30px; margin-top: 200px;">
           <!-- 左侧图片 -->
           <img
-            src="/public/logo.png"
+            src="/public/logo.webp"
             alt="logo"
             style="width: 260px; height: 340px; object-fit: cover; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); transition: transform 0.3s;"
             @mouseover="hoverImg = true"
@@ -90,7 +90,6 @@ export function createDownloadForm(Vue, naive) {
              可下载禁漫天堂内的本子，欢迎大家来测试！<br>
              局限性: 只能用禁漫天堂地址上的数字id下载<br>
              如果大家觉得好用的话就请麻烦宣传和赞助一下！<br>
-             毕竟目前服务器费用非常昂贵<br>
              PS.目前只能下载禁漫天堂内的本子哦！别的网站的暂时未收录<br>
              <a href="/admins/pages" style="font-weight: 500;">前往历史记录 →</a><br>
    
@@ -106,14 +105,6 @@ export function createDownloadForm(Vue, naive) {
             const hoverCard = ref(false)
             const message = useMessage()
 
-            const themeOverrides = {
-                common: {
-                    primaryColor: '#ff7eb9',        // 全局主题色改成粉色
-                    primaryColorHover: '#ff6aa1',
-                    primaryColorPressed: '#ff5890',
-                    primaryColorSuppl: '#ffd6e8'
-                }
-            }
 
             const handleEnter = () => {
                 const id = inputId.value.trim()

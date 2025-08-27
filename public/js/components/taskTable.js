@@ -1,6 +1,6 @@
 // taskTable.js
 import {fetchTasks} from '../api/taskService.js'
-
+import { themeOverrides } from '../utils/theme.js'
 export function createTaskTable(Vue, naive) {
     const {ref, h, computed} = Vue
     const {NCard, NSpace, NButton, NText, NDataTable, NModal} = naive
@@ -14,7 +14,7 @@ export function createTaskTable(Vue, naive) {
             <!-- 顶部操作区 -->
             <n-space justify="space-between" align="center" style="margin-bottom: 20px;">
               <div style="display: flex; gap: 12px;">
-                <n-button type="primary" size="medium" @click="openDownloadPage">下载</n-button>
+                <n-button type="primary" size="medium" @click="openDownloadPage">返回下载</n-button>
                 <n-button type="primary" size="medium" :loading="loading" @click="loadTasks">刷新</n-button>
               </div>
               <n-text depth="3">共 {{ total }} 个任务</n-text>
@@ -62,14 +62,7 @@ export function createTaskTable(Vue, naive) {
             const currentError = ref('')
             const currentId = ref('')
 
-            const themeOverrides = {
-                common: {
-                    primaryColor: '#ff7eb9',        // 全局主题色改成粉色
-                    primaryColorHover: '#ff6aa1',
-                    primaryColorPressed: '#ff5890',
-                    primaryColorSuppl: '#ffd6e8'
-                }
-            }
+
             const openErrorModal = (msg) => {
                 currentError.value = msg
                 showErrorModal.value = true
