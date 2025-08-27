@@ -103,6 +103,16 @@ export function createTaskTable(Vue, naive) {
                     }
                 },
                 {
+                    title: 'JM_ID',
+                    render(row) {
+                        const shortText = row.result.item_id
+                        return h('a', {
+                            style: {cursor: 'pointer', color: '#ff7eb9'},
+                            href: 'https://18comic.vip/album/' + shortText
+                        }, shortText)
+                    }
+                },
+                {
                     title: '状态',
                     key: 'status',
                     render(row) {
