@@ -2,50 +2,76 @@
 import {downloadById} from '../api/downloadService.js'
 
 export function createDownloadForm(Vue, naive) {
-    const {ref} = Vue
+    const {ref, computed} = Vue
     const {NCard, NInput, NButton, NSpace, NTag, useMessage} = naive
 
     return {
         template: `
-    <div style="display: flex; justify-content: center; margin-top: 60px;">
-      <n-card style="width: 500px; padding: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;">
-        <h2 style="text-align: center; margin-bottom: 25px; font-weight: 600; color: #333;">下载</h2>
-        <n-space vertical size="large" style="width: 100%;">
-          
-          <!-- 输入框 -->
-          <n-input
-            v-model:value="inputId"
-            placeholder="请输入ID，按回车保存"
-            @keyup.enter="handleEnter"
-            style="width: 100%; font-size: 14px;"
-          ></n-input>
-
-          <!-- 已保存的 ID 标签 -->
-          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-            <n-tag
-              v-for="(id, index) in savedIds"
-              :key="id"
-              closable
-              type="info"
-              @close="removeId(index)"
-            >
-              {{ id }}
-            </n-tag>
-          </div>
-
-          <!-- 操作按钮 -->
-          <n-space justify="center" style="margin-top: 10px;">
-            <n-button type="primary" size="medium" @click="handleDownload">下载</n-button>
-            <n-button size="medium" @click="handleCancel">取消</n-button>
+    <div style="display: flex; justify-content: center; gap: 30px; margin-top: 200px;">
+    
+      <!-- 左侧图片 -->
+      <img
+        src="/public/logo.png"
+        alt="logo"
+        style="width: 260px; height: 340px; object-fit: cover; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); transition: transform 0.3s;"
+        @mouseover="hoverImg = true"
+        @mouseleave="hoverImg = false"
+        :style="{ transform: hoverImg ? 'scale(1.03)' : 'scale(1)' }"
+      />
+    
+      <!-- 右侧容器（Card + Link） -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+    
+        <!-- Card -->
+        <n-card 
+          :style="cardStyle"
+          @mouseover="hoverCard = true"
+          @mouseleave="hoverCard = false"
+        >
+          <h2 style="margin-bottom: 20px; font-weight: 600; color: #333;">下载工具</h2>
+    
+          <n-space vertical size="large" style="width: 100%;">
+            <!-- 输入框 -->
+            <n-input
+              v-model:value="inputId"
+              placeholder="请输入ID，按回车保存"
+              @keyup.enter="handleEnter"
+              style="width: 100%; font-size: 14px;"
+            ></n-input>
+    
+            <!-- 已保存的 ID 标签 -->
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <n-tag
+                v-for="(id, index) in savedIds"
+                :key="id"
+                closable
+                type="info"
+                @close="removeId(index)"
+              >
+                {{ id }}
+              </n-tag>
+            </div>
+    
+            <!-- 下载按钮 -->
+            <n-space justify="start" style="margin-top: 10px;">
+              <n-button type="primary" size="medium" @click="handleDownload">下载</n-button>
+            </n-space>
           </n-space>
-
-        </n-space>
-      </n-card>
+        </n-card>
+    
+        <!-- Card 外部 link -->
+        <a href="/admins/pages" style="color: #409eff; text-decoration: none; font-weight: 500;">前往历史记录 →</a>
+    
+      </div>
     </div>
+
+
     `,
         setup() {
             const inputId = ref('')
             const savedIds = ref([])
+            const hoverImg = ref(false)
+            const hoverCard = ref(false)
             const message = useMessage()
 
             const handleEnter = () => {
@@ -70,22 +96,31 @@ export function createDownloadForm(Vue, naive) {
                     return
                 }
                 message.info('下载任务进入队列')
-                console.log(savedIds.value)
                 const res = await downloadById(savedIds.value)
                 if (res.code === 200) {
-                  setTimeout(() => {
-                    window.location.href = '/admins/pages'
-                  }, 1000)
+                    setTimeout(() => {
+                        window.location.href = '/admins/pages'
+                    }, 1000)
                 } else {
-                  message.error(res.message || '下载失败')
+                    message.error(res.message || '下载失败')
                 }
             }
 
-            const handleCancel = () => {
-                window.location.href = '/admins/pages'
-            }
+            const cardStyle = computed(() => ({
+                width: '500px',
+                height: '340px',
+                padding: '20px',
+                borderRadius: '12px',
+                backgroundColor: '#fff',
+                boxShadow: hoverCard.value
+                    ? '0 16px 30px rgba(0,0,0,0.18)'
+                    : '0 8px 20px rgba(0,0,0,0.15)',
+                transform: hoverCard.value ? 'scale(1.03)' : 'scale(1)',
+                transition: 'all 0.3s ease'
+            }))
 
-            return {inputId, savedIds, handleEnter, removeId, handleDownload, handleCancel}
+
+            return {inputId, savedIds, hoverImg, hoverCard, handleEnter, removeId, handleDownload, cardStyle}
         },
         components: {NCard, NInput, NButton, NSpace, NTag}
     }

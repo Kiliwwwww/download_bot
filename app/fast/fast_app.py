@@ -1,5 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
+from jinja2 import Environment, FileSystemLoader
+from starlette.responses import HTMLResponse
+from starlette.templating import Jinja2Templates
 
 from app.fast.router.api import api_router
 from app.fast.router.admin import admin_router
@@ -11,7 +14,14 @@ from app.utils.yaml_config import config
 
 initializer = AppInitializer(base_dir=".", logger=logger)
 initializer.initialize()  # 直接在模块加载时执行
-
+jinja_env = Environment(
+    loader=FileSystemLoader("templates"),
+    block_start_string="(%", block_end_string="%)",
+    variable_start_string="[[", variable_end_string="]]",   # 改成 [[ ]]
+    comment_start_string="(#", comment_end_string="#)"
+)
+templates = Jinja2Templates(directory="templates")
+templates.env = jinja_env  # 替换掉默认的 env
 server_app = FastAPI()
 server_app.add_middleware(
     CORSMiddleware,
@@ -28,9 +38,9 @@ server_app.mount(f"/{dest_dir}", StaticFiles(directory=f"{dest_dir}"), name=f"{d
 # 映射静态文件
 server_app.mount("/public", StaticFiles(directory="public"), name="public")
 
-@server_app.get("/")
-async def root():
-    return {"message": "jinman_pull_server"}
+@server_app.get("/", response_class=HTMLResponse)
+async def root(request: Request):
+    return templates.TemplateResponse("/download.html", {"request": request})
 
 
 
