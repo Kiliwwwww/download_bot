@@ -13,7 +13,6 @@ def start_download(jm_comic_id: int):
     task_id = str(rq.id)
     logger.info(task_id)
     TaskRecord.create_record(task_id=task_id,
-                             end_time=datetime.now(),
                              start_time=datetime.now(),
                              status="RUNNING",
                              result={
