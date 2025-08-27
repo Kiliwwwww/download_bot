@@ -103,6 +103,7 @@ export function createTaskTable(Vue, naive) {
                 {
                     title: '任务ID',
                     key: 'task_id',
+                    align: 'center',
                     render(row) {
                         const shortText = row.task_id.length > task_id_max_size ? row.task_id.slice(0, task_id_max_size) : row.task_id
                         return h('span', {
@@ -113,6 +114,7 @@ export function createTaskTable(Vue, naive) {
                 },
                 {
                     title: 'JM_ID',
+                    align: 'center',
                     render(row) {
                         const shortText = row.result.item_id
                         return h('a', {
@@ -124,6 +126,7 @@ export function createTaskTable(Vue, naive) {
                 {
                     title: '状态',
                     key: 'status',
+                    align: 'center',
                     render(row) {
                         let status = '失败'
                         let color = 'red'
@@ -140,6 +143,7 @@ export function createTaskTable(Vue, naive) {
                 {
                     title: '开始时间',
                     key: 'start_time',
+                    align: 'center',
                     render(row) {
                         if (!row.start_time) return ''
                         const d = new Date(row.start_time)
@@ -149,6 +153,7 @@ export function createTaskTable(Vue, naive) {
                 {
                     title: '完成时间',
                     key: 'end_time',
+                    align: 'center',
                     render(row) {
                         if (!row.end_time) return ''
                         const d = new Date(row.end_time)
@@ -158,6 +163,7 @@ export function createTaskTable(Vue, naive) {
                 {
                     title: '结果',
                     key: 'result',
+                    align: 'center',
                     render(row) {
                         if (row.result && row.result.error) {
                             const text = row.result.error
@@ -167,12 +173,10 @@ export function createTaskTable(Vue, naive) {
                                 onClick: () => openErrorModal(text)
                             }, shortText)
                         } else if (row.result && row.result.url) {
-                            const fullUrl = window.location.origin + '/' + row.result.url
-                            return h('a', {
-                                href: fullUrl,
-                                target: '_blank',
-                                style: {color: '#409EFF'}
-                            }, row.result.item_id || '查看')
+                            return h('p', {
+                                style: {color: "#ff7eb9"}
+                            },  '下载完成')
+
                         }
                         return null
                     }
@@ -189,6 +193,14 @@ export function createTaskTable(Vue, naive) {
                                 style: {color: '#409EFF', cursor: 'pointer'},
                                 onClick: () => retryTask(row)
                             }, '重试')
+                        }else{
+                            const fullUrl = window.location.origin + '/' + row.result.url
+
+                            return h('a', {
+                                href: fullUrl,
+                                target: '_blank',
+                                style: {color: '#409EFF','text-decoration': 'none'}
+                            }, '下载')
                         }
                         return null
                     }
