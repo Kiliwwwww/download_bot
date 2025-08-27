@@ -9,5 +9,5 @@ celery_app = Celery(
     "worker",
     broker=redis_url,  # Redis 作为消息队列
     backend=redis_end_url,  # 存储任务结果
-    include=["app.job"]
+    include=["app.job.download_job", "app.job.retry_job"]
 )
