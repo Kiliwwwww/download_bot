@@ -30,7 +30,7 @@ def read_item(items: Item):
         for item in items.jm_comic_ids:
             jm_comic_id = int(item)
             task = start_download(jm_comic_id)
-            task_ids.append(task.id)
+            task_ids.append(task)
         return StandardResponse(
             data={"task_ids": task_ids}
         )
@@ -40,6 +40,7 @@ def read_item(items: Item):
             code=500,
             message=f"创建任务失败: {str(e)}"
         )
+
 
 # 重试下载
 @downloads_router.post("/retry", response_model=StandardResponse[dict])
