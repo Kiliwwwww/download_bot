@@ -1,3 +1,2 @@
 web: uvicorn app.fast.fast_app:server_app --reload --port 12345 --host 0.0.0.0
-worker: celery --app=app.celery.celery_worker:celery_app worker -n worker1 --loglevel=info
-flower: celery --app=app.celery.celery_worker:celery_app flower --port=15555 --address=0.0.0.0
+worker: rq-dashboard --redis-url redis://127.0.0.1:6380/0
