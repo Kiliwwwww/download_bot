@@ -89,7 +89,7 @@ export function createTaskTable(Vue, naive) {
 
             const retryTask = async (row) => {
                 message.info('下载任务重新进入队列')
-                const res = await retryById(row.task_id)
+                const res = await retryById([row.task_id])
                 if (res.code === 200) {
                     setTimeout(() => {
                         window.location.href = '/admins/pages'
