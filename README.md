@@ -147,5 +147,8 @@ database:
 ### jm\_downloader.yml
 
 详细配置可参考官方文档：
+
 [JMComic 配置文件语法说明](https://github.com/hect0x7/JMComic-Crawler-Python/blob/master/assets/docs/sources/option_file_syntax.md)
+
+[JMComic 使用教程文档](https://jmcomic.readthedocs.io/zh-cn/latest/)
 
