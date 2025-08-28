@@ -7,23 +7,12 @@ from app.utils.redis_utils import RedisUtils, JM_KEY
 
 # 全局变量初始化
 redis_util = RedisUtils()
-client = None  # 先声明，后续初始化
-option = None
-
-def init_jm_client():
-    """初始化JM客户端，确保配置只加载一次"""
-    global client
-    if client is None:
-        # 创建配置对象
-        option = jmcomic.create_option_by_file(JM_CONFIG_FILE)
-        client = option.new_jm_client()
-    return client
+option = jmcomic.create_option_by_file(JM_CONFIG_FILE)
+client = option.new_jm_client()  # 先声明，后续初始化
 
 
 # 获取搜索列表
 def list_for_type(page, time, category, order_by):
-    # 确保客户端已初始化
-    init_jm_client()
     return client.categories_filter(
         page=page,
         time=time,
@@ -39,8 +28,6 @@ def download_and_zip(jm_id: int) -> str:
     :param jm_id: 本子 ID
     :return: 压缩包路径
     """
-    # 确保客户端已初始化
-    init_jm_client()
 
     # 使用 option 对象来下载本子
     data1 = download_album(jm_id, option)
@@ -58,10 +45,8 @@ def download_and_zip(jm_id: int) -> str:
 
 class SearchHelper:
     def __init__(self):
-        # 初始化客户端
-        init_jm_client()
+        return
 
-    # 最新列表
     def last_list(self, page):
         return list_for_type(page, JmMagicConstants.TIME_ALL,
                              JmMagicConstants.CATEGORY_ALL, JmMagicConstants.ORDER_BY_LATEST)
