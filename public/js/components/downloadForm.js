@@ -9,7 +9,7 @@ export function createDownloadForm(Vue, naive) {
         template: `
     <n-config-provider :theme-overrides="themeOverrides">
       <div style="display: flex; justify-content: center; gap: 30px; margin-top: 200px;">
-        <a href="https://github.com/Kiliwwwww/download_bot" target="_blank" style="color: #ff7eb9;text-decoration: none;">
+        <a href="https://github.com/Kiliwwwww/download_bot" target="_blank" style="color: #ff7eb9;text-decoration: none;width: 260px; height: 340px;">
             <img
               src="/public/img/logo.webp"
               alt="logo"
