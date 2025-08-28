@@ -47,6 +47,9 @@ class SearchHelper:
     def __init__(self):
         return
 
+    def search(self, page, time, category, order_by):
+        return list_for_type(page, time, category, order_by)
+
     def last_list(self, page):
         return list_for_type(page, JmMagicConstants.TIME_ALL,
                              JmMagicConstants.CATEGORY_ALL, JmMagicConstants.ORDER_BY_LATEST)
