@@ -64,16 +64,22 @@ export function createDownloadForm(Vue, naive) {
               </div>
 
               <n-button
-                    size="medium"
-                    @mousedown="startPress"
-                    @mouseup="cancelPress"
-                    @mouseleave="cancelPress"
-                    :class="{ 'shake': hoverBtn }"
-                    style="width: 160px; padding: 10px 20px; font-weight: 600; font-size: 15px; color: #fff; border-radius: 10px; background: linear-gradient(90deg, #ff7eb9 20%, #ff758c 80%); box-shadow: 0 6px 12px rgba(0,0,0,0.15); transition: all 0.2s ease; border: none; cursor: pointer;"
-                    @mouseover="hoverBtn = true"
-                    @mouseleave="hoverBtn = false">
-                    开始下载 🎉
-                  </n-button>
+                size="medium"
+                @mousedown="startPress"
+                @mouseup="cancelPress"
+                @mouseleave="cancelPress"
+                :class="{ 'shake': hoverBtn }"
+                style="width: 160px; padding: 10px 20px; font-weight: 600; font-size: 15px; color: #fff; border-radius: 10px; background: linear-gradient(90deg, #ff7eb9 20%, #ff758c 80%); box-shadow: 0 6px 12px rgba(0,0,0,0.15); transition: all 0.2s ease; border: none; cursor: pointer;"
+                @mouseover="hoverBtn = true"
+                @mouseleave="hoverBtn = false">
+                开始下载 🎉
+              </n-button>
+              <n-button
+                size="medium"                
+                :class="{ 'shake': hoverBtn }"
+                style="width: 160px; padding: 10px 20px; font-weight: 600; font-size: 15px; color: #fff; border-radius: 10px; background: linear-gradient(90deg, #ff7eb9 20%, #ff758c 80%); box-shadow: 0 6px 12px rgba(0,0,0,0.15); transition: all 0.2s ease; border: none; cursor: pointer;">
+                随机本子 🎉
+              </n-button>
 
             </div>
           </n-card>
