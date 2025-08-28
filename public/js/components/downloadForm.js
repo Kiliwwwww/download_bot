@@ -74,12 +74,75 @@ export function createDownloadForm(Vue, naive) {
                 @mouseleave="hoverBtn = false">
                 开始下载 🎉
               </n-button>
-              <n-button
-                size="medium"                
-                :class="{ 'shake': hoverBtn }"
-                style="width: 160px; padding: 10px 20px; font-weight: 600; font-size: 15px; color: #fff; border-radius: 10px; background: linear-gradient(90deg, #ff7eb9 20%, #ff758c 80%); box-shadow: 0 6px 12px rgba(0,0,0,0.15); transition: all 0.2s ease; border: none; cursor: pointer;">
-                随机本子 🎉
-              </n-button>
+              <!-- 修改后的按钮区域，添加了浮动效果和更好的布局 -->
+              <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; width: 50%;">
+                  <n-button
+                      size="medium"
+                      style="width: 160px; padding: 10px 20px; font-weight: 600; font-size: 15px; color: #fff; border-radius: 10px; background: linear-gradient(90deg, #ff7eb9 20%, #ff758c 80%); box-shadow: 0 6px 12px rgba(0,0,0,0.15); transition: all 0.2s ease; border: none; cursor: pointer;"
+                      @click="showMoreModal = true"
+                    >
+                      更多下载 🐳
+                    </n-button>
+                    <!-- 弹窗 -->
+                    <n-modal
+                  v-model:show="showMoreModal"
+                  preset="card"
+                  :style="{
+                    width: '420px',
+                    borderRadius: '20px',
+                    padding: '24px',
+                    background: 'linear-gradient(180deg, #fff 60%, #fff0f6 100%)',
+                    boxShadow: '0 12px 28px rgba(0,0,0,0.15)'
+                  }"
+                >
+                  <template #header>
+                    <h3
+                      style="
+                        margin: 0;
+                        font-weight: 800;
+                        font-size: 22px;
+                        text-align: center;
+                        background: linear-gradient(90deg,#ff7eb9,#ff758c);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                      "
+                    >
+                      更多下载选项
+                    </h3>
+                  </template>
+                
+                  <div style="display:flex; flex-wrap:wrap; gap:16px; justify-content:center; margin-top:20px;">
+                    <n-button
+                      v-for="btn in moreBtns"
+                      :key="btn.label"
+                      size="large"
+                      style="
+                        flex:1 1 40%;
+                        min-width: 140px;
+                        height: 48px;
+                        font-weight: 600;
+                        font-size: 15px;
+                        color: #fff;
+                        border-radius: 14px;
+                        background: linear-gradient(90deg,#ff7eb9 20%,#ff758c 80%);
+                        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+                        border: none;
+                        transition: all 0.25s ease;
+                        transform: scale(1);
+                      "
+                      @mouseover="hover = btn.label"
+                      @mouseleave="hover = ''"
+                      :style="hover === btn.label ? {
+                        transform: 'scale(1.06) translateY(-4px)',
+                        boxShadow: '0 10px 20px rgba(0,0,0,0.18)'
+                      } : {}"
+                    >
+                      {{ btn.label }}
+                    </n-button>
+                  </div>
+                </n-modal>
+
+              </div>
 
             </div>
           </n-card>
@@ -106,6 +169,14 @@ export function createDownloadForm(Vue, naive) {
             const hoverBtn = ref(false)
             const pressTimer = ref(null)
             const message = useMessage()
+            const showMoreModal = ref(false)
+            const hover = ref('')
+            const moreBtns = ref([
+              { label: '最新本子' },
+              { label: '游览最高' },
+              { label: '点赞最多' },
+              { label: '最多图片' }
+            ])
             const handleEnter = () => {
                 const id = inputId.value.trim()
                 if (!id) {
@@ -184,7 +255,10 @@ export function createDownloadForm(Vue, naive) {
                 cancelPress,
                 cardStyle,
                 themeOverrides,
-                filterNumber
+                filterNumber,
+                showMoreModal,
+                hover,
+                moreBtns
             }
         },
         components: {NCard, NInput, NButton, NTag, NConfigProvider, NTooltip}
