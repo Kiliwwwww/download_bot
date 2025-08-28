@@ -40,7 +40,7 @@ out/
 build/
 books/
 zip/
-logs/
+log/
 Procfile
 # Mac 系统文件
 .DS_Store
