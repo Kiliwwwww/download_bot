@@ -23,7 +23,7 @@
 * 异步下载漫画
 * 自动打包为压缩包（zip）
 
-后端技术栈：**FastAPI + Celery + Honcho + Redis**
+后端技术栈：**FastAPI + RQ + Honcho + Redis**
 
 前端技术栈：**Vue3 + Naive-ui**
 
@@ -86,8 +86,7 @@ docker pull python:3.12
 
 ```bash
 # 安装依赖
-pip install -r requirements.txt
-
+bash init_docker.sh
 # 复制配置文件
 cp config/config.yml.example config/config.yml
 cp config/jm_downloader.yml.example config/jm_downloader.yml
@@ -99,7 +98,7 @@ python migration_db.py
 
 ```bash
 # 服务器启动
-honcho start
+bash start.sh
 ```
 ### 数据库说明
 ```bash
@@ -115,12 +114,7 @@ create_migration命令使用说明: [create_migration.md](md/create_migration.md
 db_manager.py工具类说明: [db_manager.md](md/db_manager.md)
 ### 配置说明
 
-* **Redis 配置**
-  修改 `config/config.yml` 文件中的 `server.redis` 字段。
-* **Flower 监控地址**
-  `http://{ip}:5555`
-* **端口配置**
-  修改 [Procfile](Procfile) 文件。
+见 config/config.yml 文件
 
 ---
 
@@ -130,10 +124,24 @@ db_manager.py工具类说明: [db_manager.md](md/db_manager.md)
 
 ```yaml
 save:
-  dest_dir: "zip"       # zip 包保存路径
-  cache: true           # 是否启用缓存
+  dest_dir: "zip" # 打包zip的地址
+  cache: true # 是否使用缓存
 server:
-  redis: "redis://localhost:6379/2"  # Redis 地址
+  redis: 'redis://192.168.2.130:6380/0' 
+  port: 12345 # 服务器端口
+  dashboard_port: 9181 # 异步任务监控端口
+database:
+  type: sqlite
+#  mysql:
+#    host: localhost
+#    user: root
+#    password: 123456
+#    database: test
+#    port: 3306
+  sqlite:
+    database: 'app.sqlite'
+
+
 ```
 
 ### jm\_downloader.yml
