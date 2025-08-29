@@ -10,6 +10,22 @@ export function createJmListPage(Vue, naive) {
       <n-config-provider :theme-overrides="themeOverrides">
         <div style="display:flex; flex-direction:column; align-items:center; margin-top: 60px; gap: 20px; margin-bottom: 60px;">
           <n-card :style="cardStyle">
+          <a 
+            href="/" 
+            style="
+              position: absolute; 
+              top: 20px; 
+              left: 20px; 
+              color: #ff7eb9; 
+              font-weight: 600; 
+              text-decoration: none;
+              transition: all 0.2s;
+            "
+            @mouseover="hoverBack=true"
+            @mouseleave="hoverBack=false"
+            :style="hoverBack ? 'color:#ff4d94; transform: scale(1.05);' : ''">
+            返回主页
+          </a>
             <h2 style="
               font-weight: 800;
               font-size: 26px;
@@ -122,7 +138,7 @@ export function createJmListPage(Vue, naive) {
             const pageTitle = computed(() => typeMap[type] || 'JM 列表')
             const totalPages = computed(() => Math.ceil(total.value / perPage.value))
             const loadingBar = useLoadingBar()
-
+            const hoverBack = ref(false)
             const fetchList = async () => {
                 loading.value = true
                 try {
@@ -192,7 +208,8 @@ export function createJmListPage(Vue, naive) {
                 isTop,
                 isBottom,
                 hoverBtn,
-                hoverTopBtn
+                hoverTopBtn,
+                hoverBack
             }
         },
         components: {NCard, NConfigProvider, NButton, NPagination, NSpin}

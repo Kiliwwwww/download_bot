@@ -9,7 +9,7 @@ export const themeOverrides = {
     LoadingBar: {
             // 颜色（支持十六进制、rgb、rgba、hsl 等）
             colorLoading: '#ff7eb9', // 加载中颜色
-            colorSuccess: '#ff5890', // 成功颜色
+            colorSuccess: '#ff7eb9', // 成功颜色
             colorError: '#ff4d4f',   // 错误颜色
             colorWarning: '#faad14', // 警告颜色
             // 高度
