@@ -7,7 +7,6 @@ export function createDownloadForm(Vue, naive) {
 
     return {
         template: `
-    <n-config-provider :theme-overrides="themeOverrides">
       <div style="display: flex; justify-content: center; gap: 30px; margin-top: 200px;">
         <a href="https://github.com/Kiliwwwww/download_bot" target="_blank" style="color: #ff7eb9;text-decoration: none;width: 260px; height: 340px;">
             <img
@@ -130,6 +129,7 @@ export function createDownloadForm(Vue, naive) {
                         transition: all 0.25s ease;
                         transform: scale(1);
                       "
+                      @click="goToList(btn.type)"
                       @mouseover="hover = btn.label"
                       @mouseleave="hover = ''"
                       :style="hover === btn.label ? {
@@ -159,7 +159,6 @@ export function createDownloadForm(Vue, naive) {
 
         </div>
       </div>
-    </n-config-provider>
     `,
         setup() {
             const inputId = ref('')
@@ -172,11 +171,15 @@ export function createDownloadForm(Vue, naive) {
             const showMoreModal = ref(false)
             const hover = ref('')
             const moreBtns = ref([
-              { label: '最新本子' },
-              { label: '游览最高' },
-              { label: '点赞最多' },
-              { label: '最多图片' }
+                {label: '最新本子', type: 'last'},
+                {label: '游览最高', type: 'view'},
+                {label: '点赞最多', type: 'like'},
+                {label: '最多图片', type: 'picture'}
             ])
+            const goToList = (type) => {
+                window.location.href = `/admins/pages/jm_list_page.html?type=${type}`
+            }
+
             const handleEnter = () => {
                 const id = inputId.value.trim()
                 if (!id) {
@@ -258,7 +261,8 @@ export function createDownloadForm(Vue, naive) {
                 filterNumber,
                 showMoreModal,
                 hover,
-                moreBtns
+                moreBtns,
+                goToList
             }
         },
         components: {NCard, NInput, NButton, NTag, NConfigProvider, NTooltip}

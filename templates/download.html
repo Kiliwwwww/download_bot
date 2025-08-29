@@ -68,24 +68,33 @@
 </footer>
 <script type="module">
     import {createDownloadForm} from '/public/js/components/downloadForm.js'
-
+   import {themeOverrides} from '/public/js/utils/theme.js'
     const {NMessageProvider} = naive
 
     const App = {
         template:
           `
-            <n-message-provider>
-              <download-form/>
-            </n-message-provider>
+            <n-config-provider :theme-overrides="themeOverrides">
+                <n-message-provider>
+                  <download-form/>
+                </n-message-provider>
+            </n-config-provider>
           `,
         components: {
             'download-form': createDownloadForm(Vue, naive),
             NMessageProvider
+        },
+        setup() {
+            return {
+                themeOverrides
+            }
         }
     }
 
     const app = Vue.createApp(App)
-    app.use(naive)
+    app.use(naive, {
+        themeOverrides
+    })
     app.mount('#app')
 </script>
 </body>

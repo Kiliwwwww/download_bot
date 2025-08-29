@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <link rel="icon" href="/public/img/logo.svg" type="image/x-icon">
     <meta charset="UTF-8">
-    <title>任务队列</title>
+    <title>下载bot酱</title>
+    <link rel="icon" href="/public/img/logo.svg" type="image/x-icon">
+    <!-- Vue 3 -->
     <script src="/public/vue.global.prod.js"></script>
+    <!-- Axios -->
     <script src="/public/axios.min.js"></script>
+    <!-- Naive UI -->
     <script src="/public/naive-ui.prod.js"></script>
     <style>
-         html, body {
+        html, body {
             font-family: Arial;
             background: #f5f5f5;
             margin: 0;
@@ -29,6 +32,8 @@
             font-size: 14px;
             padding: 10px 0;
         }
+
+
     </style>
 </head>
 <body>
@@ -40,19 +45,24 @@
                 style="color: #ff7eb9;text-decoration: none;">hect0x7/JMComic-Crawler-Python</a>
 </footer>
 <script type="module">
-    import {createTaskTable} from '../../public/js/components/taskTable.js'
+    import {createJmListPage} from '/public/js/components/jmListPage.js'
+
     const {NMessageProvider} = naive
-       import {themeOverrides} from '/public/js/utils/theme.js'
-    const app = Vue.createApp({
-        template: `
-          <n-config-provider :theme-overrides="themeOverrides">
-              <n-message-provider>
-                 <task-table/>
-              </n-message-provider>
-          </n-config-provider>
-        `,
+    import {themeOverrides} from '/public/js/utils/theme.js'
+
+    const App = {
+        template:
+                `
+                  <n-config-provider :theme-overrides="themeOverrides">
+                    <n-loading-bar-provider>
+                      <n-message-provider>
+                        <jm_list_page/>
+                      </n-message-provider>
+                    </n-loading-bar-provider>
+                  </n-config-provider>
+                `,
         components: {
-            'task-table': createTaskTable(Vue, naive),
+            'jm_list_page': createJmListPage(Vue, naive),
             NMessageProvider
         },
         setup() {
@@ -61,8 +71,9 @@
             }
 
         }
-    })
+    }
 
+    const app = Vue.createApp(App)
     app.use(naive, {
         themeOverrides
     })

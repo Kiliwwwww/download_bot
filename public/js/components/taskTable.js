@@ -9,7 +9,6 @@ export function createTaskTable(Vue, naive) {
 
     return {
         template: `
-    <n-config-provider :theme-overrides="themeOverrides">
       <div style="display: flex; justify-content: center; margin-top: 50px;">
         <n-card style="width: 1100px; padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;" 
                 title="任务队列" size="huge" :bordered="false">
@@ -62,7 +61,6 @@ export function createTaskTable(Vue, naive) {
           </n-modal>
         </n-card>
       </div>
-    </n-config-provider>
     `,
         setup() {
             const tasks = ref([])
