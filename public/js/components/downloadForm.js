@@ -270,7 +270,8 @@ export function createDownloadForm(Vue, naive) {
                 showMoreModal,
                 hover,
                 moreBtns,
-                goToList
+                goToList,
+                loadingBar
             }
         },
         components: {NCard, NInput, NButton, NTag, NConfigProvider, NTooltip}

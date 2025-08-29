@@ -46,9 +46,11 @@
     const app = Vue.createApp({
         template: `
           <n-config-provider :theme-overrides="themeOverrides">
+            <n-loading-bar-provider>
               <n-message-provider>
                  <task-table/>
               </n-message-provider>
+            </n-loading-bar-provider>
           </n-config-provider>
         `,
         components: {
