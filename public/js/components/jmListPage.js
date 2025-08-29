@@ -133,7 +133,7 @@ export function createJmListPage(Vue, naive) {
             const hoverTopBtn = ref(false)
 
             const typeMap = {
-                last: '最新本子',
+                last: '最新漫画',
                 view: '游览最高',
                 like: '点赞最多',
                 picture: '最多图片'

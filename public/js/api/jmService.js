@@ -1,6 +1,6 @@
 /**
  * 获取JMComic列表
- * @param {string} type - 类型: last(最新本子), view(游览最高), like(点赞最多), picture(最多图片)
+ * @param {string} type - 类型: last(最新漫画), view(游览最高), like(点赞最多), picture(最多图片)
  * @param {number} page - 页码
  * @returns {Promise<Object>} - 接口返回结果
  */

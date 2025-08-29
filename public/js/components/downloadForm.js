@@ -175,7 +175,7 @@ export function createDownloadForm(Vue, naive) {
             const showMoreModal = ref(false)
             const hover = ref('')
             const moreBtns = ref([
-                {label: '最新本子', type: 'last'},
+                {label: '最新漫画', type: 'last'},
                 {label: '游览最高', type: 'view'},
                 {label: '点赞最多', type: 'like'},
                 {label: '最多图片', type: 'picture'}
