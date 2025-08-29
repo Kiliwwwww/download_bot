@@ -75,9 +75,11 @@
         template:
           `
             <n-config-provider :theme-overrides="themeOverrides">
+               <n-loading-bar-provider>
                 <n-message-provider>
                   <download-form/>
                 </n-message-provider>
+               </n-loading-bar-provider>
             </n-config-provider>
           `,
         components: {

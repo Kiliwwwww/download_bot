@@ -3,7 +3,7 @@ import {themeOverrides} from '../utils/theme.js'
 
 export function createDownloadForm(Vue, naive) {
     const {ref, computed} = Vue
-    const {NCard, NInput, NButton, NTag, NConfigProvider, NTooltip, useMessage} = naive
+    const {NCard, NInput, NButton, NTag, NConfigProvider, NTooltip, useMessage, useLoadingBar} = naive
 
     return {
         template: `
@@ -156,7 +156,11 @@ export function createDownloadForm(Vue, naive) {
              <br>
              <a href="/admins/pages" style="font-weight: 500;">前往任务队列 →</a><br>
           </p>
-
+            <div style="position: fixed; bottom: 40px; right: 40px; display: flex; flex-direction: column; gap: 12px; z-index: 999;">
+              <a href="https://github.com/Kiliwwwww/download_bot" target="_blank">
+                <img src="/public/img/logo.svg" style="width:50px; height:50px; border-radius:25px; background: linear-gradient(135deg, #ff7eb9, #ff758c); color:#fff; font-size:22px; font-weight:700; box-shadow:0 6px 14px rgba(0,0,0,0.2); transition: transform 0.2s;" />
+              </a>
+            </div>
         </div>
       </div>
     `,
@@ -176,6 +180,7 @@ export function createDownloadForm(Vue, naive) {
                 {label: '点赞最多', type: 'like'},
                 {label: '最多图片', type: 'picture'}
             ])
+            const loadingBar = useLoadingBar()
             const goToList = (type) => {
                 window.location.href = `/admins/pages/jm_list_page.html?type=${type}`
             }
@@ -214,11 +219,14 @@ export function createDownloadForm(Vue, naive) {
                 hoverBtn.value = true
                 pressTimer.value = setTimeout(() => {
                     hoverBtn.value = false
+                    loadingBar.start()
                     message.info('下载任务进入队列')
                     downloadById(savedIds.value).then(res => {
                         if (res.code === 200) {
+                            loadingBar.finish()
                             setTimeout(() => window.location.href = '/admins/pages', 1000)
                         } else {
+                            loadingBar.error()
                             message.error(res.message || '下载失败')
                         }
                     })
