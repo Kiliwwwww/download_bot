@@ -205,7 +205,7 @@ export function createDownloadForm(Vue, naive) {
                 if (!savedIds.value.length) {
                     return
                 }
-                message.loading('（ﾉ>ω<)ﾉ长按五秒下载本子!!!', {showIcon: false})
+                message.loading('（ﾉ>ω<)ﾉ长按一坤秒下载本子!!!', {showIcon: false})
 
 
                 hoverBtn.value = true
@@ -219,7 +219,7 @@ export function createDownloadForm(Vue, naive) {
                             message.error(res.message || '下载失败')
                         }
                     })
-                }, 5000) // 长按 1.5 秒
+                }, 2500) // 长按 1.5 秒
             }
 
             const cancelPress = () => {

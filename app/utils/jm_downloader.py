@@ -63,3 +63,8 @@ class SearchHelper:
     def like_list(self, page):
         return list_for_type(page, JmMagicConstants.TIME_ALL,
                              JmMagicConstants.CATEGORY_ALL, JmMagicConstants.ORDER_BY_LIKE)
+
+    # 页数最多
+    def picture_list(self, page):
+        return list_for_type(page, JmMagicConstants.TIME_ALL,
+                             JmMagicConstants.CATEGORY_ALL, JmMagicConstants.ORDER_BY_PICTURE)
