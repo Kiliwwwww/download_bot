@@ -2,13 +2,13 @@ import {themeOverrides} from '../utils/theme.js'
 import {fetchJmList} from '../api/jmService.js'
 
 export function createJmListPage(Vue, naive) {
-    const {ref, onMounted, computed} = Vue
+    const {ref, onMounted, computed, onBeforeUnmount} = Vue
     const {NCard, NConfigProvider, NButton, NPagination, NSpin, useMessage, useLoadingBar} = naive
 
     return {
         template: `
       <n-config-provider :theme-overrides="themeOverrides">
-        <div style="display:flex; flex-direction:column; align-items:center; margin-top: 60px; gap: 20px;">
+        <div style="display:flex; flex-direction:column; align-items:center; margin-top: 60px; gap: 20px; margin-bottom: 60px;">
           <n-card :style="cardStyle">
             <h2 style="
               font-weight: 800;
@@ -61,6 +61,39 @@ export function createJmListPage(Vue, naive) {
           >
             ← 返回
           </n-button>
+        <!-- 页面右下角浮动按钮 -->
+            <div style="position: fixed; bottom: 40px; right: 40px; display: flex; flex-direction: column; gap: 12px; z-index: 999;">
+              <!-- 跳到底部 -->
+              <Transition name="fade">
+                <n-button
+                  v-if="!isBottom"
+                  @click="goBottom"
+                  title="跳到底部"
+                  style="width:50px; height:50px; border-radius:25px; background: linear-gradient(135deg, #ff7eb9, #ff758c); color:#fff; font-size:22px; font-weight:700; box-shadow:0 6px 14px rgba(0,0,0,0.2); transition: transform 0.2s;"
+                  @mouseover="hoverBtn=true" @mouseleave="hoverBtn=false"
+                  :style="hoverBtn ? 'transform: scale(1.1); box-shadow:0 8px 18px rgba(0,0,0,0.25);' : ''"
+                >
+                  ↓
+                </n-button>
+              </Transition>
+            
+              <!-- 返回顶部 -->
+              <Transition name="fade">
+                <n-button
+                  v-if="!isTop"
+                  @click="goTop"
+                  title="返回顶部"
+                  style="width:50px; height:50px; border-radius:25px; background: linear-gradient(135deg, #7ebfff, #758cff); color:#fff; font-size:22px; font-weight:700; box-shadow:0 6px 14px rgba(0,0,0,0.2); transition: transform 0.2s;"
+                  @mouseover="hoverTopBtn=true" @mouseleave="hoverTopBtn=false"
+                  :style="hoverTopBtn ? 'transform: scale(1.1); box-shadow:0 8px 18px rgba(0,0,0,0.25);' : ''"
+                >
+                  ↑
+                </n-button>
+              </Transition>
+            </div>
+
+
+        
         </div>
       </n-config-provider>
     `,
@@ -74,6 +107,11 @@ export function createJmListPage(Vue, naive) {
             const loading = ref(false)
             const type = new URLSearchParams(window.location.search).get('type') || 'last'
 
+            const isTop = ref(true)
+            const isBottom = ref(false)
+            const hoverBtn = ref(false)
+            const hoverTopBtn = ref(false)
+
             const typeMap = {
                 last: '最新本子',
                 view: '游览最高',
@@ -82,7 +120,6 @@ export function createJmListPage(Vue, naive) {
             }
 
             const pageTitle = computed(() => typeMap[type] || 'JM 列表')
-
             const totalPages = computed(() => Math.ceil(total.value / perPage.value))
             const loadingBar = useLoadingBar()
 
@@ -105,12 +142,26 @@ export function createJmListPage(Vue, naive) {
                 }
             }
 
-            const goBack = () => {
-                window.history.back()
+            const goBack = () => window.history.back()
+            const goBottom = () => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})
+            const goTop = () => window.scrollTo({top: 0, behavior: 'smooth'})
+
+            const handleScroll = () => {
+                const scrollTop = window.scrollY
+                const windowHeight = window.innerHeight
+                const bodyHeight = document.body.scrollHeight
+                isTop.value = scrollTop < 50
+                isBottom.value = scrollTop + windowHeight >= bodyHeight - 50
             }
 
             onMounted(() => {
                 fetchList()
+                window.addEventListener('scroll', handleScroll)
+                handleScroll() // 初始化状态
+            })
+
+            onBeforeUnmount(() => {
+                window.removeEventListener('scroll', handleScroll)
             })
 
             const cardStyle = computed(() => ({
@@ -135,7 +186,13 @@ export function createJmListPage(Vue, naive) {
                 totalPages,
                 cardStyle,
                 themeOverrides,
-                loading
+                loading,
+                goBottom,
+                goTop,
+                isTop,
+                isBottom,
+                hoverBtn,
+                hoverTopBtn
             }
         },
         components: {NCard, NConfigProvider, NButton, NPagination, NSpin}
