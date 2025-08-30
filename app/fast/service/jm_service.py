@@ -3,6 +3,26 @@ from jmcomic import JmSearchPage
 from app.utils.jm_downloader import SearchHelper
 helper = SearchHelper()
 
+def get_item(jm_id: int):
+    item = helper.get(jm_id)
+    return {
+        "album_id":item.album_id,
+        "scramble_id":item.scramble_id,
+        "name":item.name,
+        "page_count":item.page_count,
+        "pub_date":item.pub_date,
+        "update_date":item.update_date,
+        "likes":item.likes,
+        "views":item.views,
+        "comment_count":item.comment_count,
+        "works":item.works,
+        "actors":item.actors,
+        "authors":item.authors,
+        "tags":item.tags,
+        "related_list":item.related_list,
+        "description":item.description
+    }
+
 
 def jm_list(page: int=1, type: str="last" ):
     # 方法映射表

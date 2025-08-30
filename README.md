@@ -98,7 +98,7 @@ python migration_db.py
 
 ```bash
 # 服务器启动
-bash start.sh
+bash bash/start.sh
 ```
 ### 数据库说明
 ```bash

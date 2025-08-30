@@ -1,11 +1,23 @@
 from fastapi import APIRouter
 from jmcomic import JmSearchPage
 
-from app.fast.service.jm_service import jm_list
+from app.fast.service.jm_service import jm_list, get_item
 from app.utils.logger_utils import logger
 from app.utils.standard_responese import StandardResponse
 
 jm_router = APIRouter(prefix="/jm", tags=["jm"])
+
+@jm_router.get("/get/{jm_id}", response_model=StandardResponse[dict])
+def get(jm_id: int):
+    try:
+        data = get_item(jm_id)
+        return StandardResponse(data=data)
+    except Exception as e:
+        logger.error(f"获取信息失败: {str(e)}")
+        return StandardResponse(
+            code=500,
+            message=f"获取信息失败: {str(e)}"
+        )
 
 
 @jm_router.get("/list", response_model=StandardResponse[dict])
