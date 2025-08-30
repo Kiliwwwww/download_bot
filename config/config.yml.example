@@ -3,6 +3,8 @@ save:
   cache: true
 server:
   redis: 'redis://localhost:6379/2'
+  port: 12345
+  dashboard_port: 9181
 database:
   type: sqlite
 #  mysql:
