@@ -1,11 +1,10 @@
 from fastapi import APIRouter
 from jmcomic import JmSearchPage
 
-from app.utils.jm_downloader import SearchHelper
+from app.fast.service.jm_service import jm_list
 from app.utils.logger_utils import logger
 from app.utils.standard_responese import StandardResponse
 
-helper = SearchHelper()
 jm_router = APIRouter(prefix="/jm", tags=["jm"])
 
 
@@ -13,19 +12,7 @@ jm_router = APIRouter(prefix="/jm", tags=["jm"])
 def last_list(page: int = 1, type: str = "last"):
     try:
         logger.info(f"page={page} type={type}")
-
-        # 方法映射表
-        type_map = {
-            "last": helper.last_list,
-            "view": helper.view_list,
-            "like": helper.view_list,   # 注意这里和 view 一样
-            "picture": helper.picture_list,
-        }
-
-        # 根据 type 获取方法，默认用 last_list
-        fetch_func = type_map.get(type, helper.last_list)
-        items: JmSearchPage = fetch_func(page=page)
-
+        items = jm_list(type=type, page=page)
         # 构造返回数据的函数
         def build_response(items: JmSearchPage | None):
             if not items:
