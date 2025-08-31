@@ -19,3 +19,9 @@ export async function fetchJmList(type = 'last', page = 1) {
     }
   }
 }
+
+
+export async function fetchJmDetail(jmId) {
+  const res = await axios.get(`/api/jm/get/${jmId}`)
+  return res.data
+}

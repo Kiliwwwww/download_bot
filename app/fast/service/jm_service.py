@@ -1,12 +1,14 @@
 from jmcomic import JmSearchPage
 
 from app.utils.jm_downloader import SearchHelper
+from app.utils.logger_utils import logger
+
 helper = SearchHelper()
 
 def get_item(jm_id: int):
-    item = helper.get(jm_id)
+    item, photo = helper.get(jm_id)
     return {
-        "album_id":item.album_id,
+        "jm_id":item.album_id,
         "scramble_id":item.scramble_id,
         "name":item.name,
         "page_count":item.page_count,
@@ -20,7 +22,8 @@ def get_item(jm_id: int):
         "authors":item.authors,
         "tags":item.tags,
         "related_list":item.related_list,
-        "description":item.description
+        "description":item.description,
+        "img_url":photo.img_url
     }
 
 
