@@ -5,7 +5,7 @@ import {downloadById} from '../api/downloadService.js'
 export function createJmDetailModal(naive, privacyModeRef) {
     const {ref, onMounted, computed, onBeforeUnmount, watch} = Vue
     const {NModal, NCard, NButton, NSpin, useMessage, useLoadingBar} = naive
-
+    const message = useMessage()
     const detailVisible = ref(false)
     const detail = ref(null)
     const detailLoading = ref(false)
