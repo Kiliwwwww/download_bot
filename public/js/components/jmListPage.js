@@ -3,7 +3,7 @@ import {fetchJmList, fetchJmDetail} from '../api/jmService.js'
 import {downloadById} from '../api/downloadService.js'
 
 export function createJmListPage(Vue, naive) {
-    const {ref, onMounted, computed, onBeforeUnmount} = Vue
+    const {ref, onMounted, computed, onBeforeUnmount, watch} = Vue
     const {
         NCard, NConfigProvider, NButton, NPagination, NSpin,
         useMessage, useLoadingBar, NModal, NSwitch
@@ -112,7 +112,6 @@ export function createJmListPage(Vue, naive) {
           </div>
 
           <!-- 详情弹窗 -->
-          <!-- 详情弹窗 -->
             <n-modal v-model:show="detailVisible" style="width: 920px; max-width:95vw;">
               <n-card :style="cardStyle" title="详情" closable @close="detailVisible=false">
                 <n-spin :show="detailLoading">
@@ -209,8 +208,11 @@ export function createJmListPage(Vue, naive) {
             const detailLoading = ref(false)
 
             // 隐私模式
-            const privacyMode = ref(false)
+            const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')  // 默认读取
 
+            watch(privacyMode, (val) => {
+              localStorage.setItem('privacyMode', val)  // 每次修改存储
+            })
             const typeMap = {
                 last: '最新漫画',
                 view: '游览最高',
