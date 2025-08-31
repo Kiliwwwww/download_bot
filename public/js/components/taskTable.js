@@ -2,9 +2,10 @@
 import {fetchTasks} from '../api/taskService.js'
 import {themeOverrides} from '../utils/theme.js'
 import {retryById} from '../api/retryService.js'
-
+import {createJmDetailModal} from '/public/js/model/JmDetailModal.js'
+import {createJmBottomBarComponent} from '/public/js/model/JmBottomBarComponent.js'
 export function createTaskTable(Vue, naive) {
-    const {ref, h,onMounted, onBeforeUnmount} = Vue
+    const {ref, h,onMounted, onBeforeUnmount, watch} = Vue
     const {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, useMessage, useLoadingBar} = naive
 
     return {
@@ -60,39 +61,9 @@ export function createTaskTable(Vue, naive) {
             </div>
           </n-modal>
         </n-card>
-        <div style="position: fixed; bottom: 40px; right: 40px; display: flex; flex-direction: column; gap: 12px; z-index: 999;">
-              <Transition name="fade">
-                <n-button
-                  v-if="!isTop"
-                  @click="goTop"
-                  title="返回顶部"
-                  style="width:50px; height:50px; border-radius:25px; background: linear-gradient(135deg, #7ebfff, #758cff); color:#fff; font-size:22px; font-weight:700; box-shadow:0 6px 14px rgba(0,0,0,0.2); transition: transform 0.2s;"
-                  @mouseover="hoverTopBtn=true" @mouseleave="hoverTopBtn=false"
-                  :style="hoverTopBtn ? 'transform: scale(1.1); box-shadow:0 8px 18px rgba(0,0,0,0.25);' : ''"
-                >
-                  ↑
-                </n-button>
-              </Transition>
-              <!-- 跳到底部 -->
-              <Transition name="fade">
-                <n-button
-                  v-if="!isBottom"
-                  @click="goBottom"
-                  title="跳到底部"
-                  style="width:50px; height:50px; border-radius:25px; background: linear-gradient(135deg, #ff7eb9, #ff758c); color:#fff; font-size:22px; font-weight:700; box-shadow:0 6px 14px rgba(0,0,0,0.2); transition: transform 0.2s;"
-                  @mouseover="hoverBtn=true" @mouseleave="hoverBtn=false"
-                  :style="hoverBtn ? 'transform: scale(1.1); box-shadow:0 8px 18px rgba(0,0,0,0.25);' : ''"
-                >
-                  ↓
-                </n-button>
-              </Transition>
-            
-              <!-- 返回顶部 -->
-              
-              <a href="https://github.com/Kiliwwwww/download_bot" target="_blank">
-                <img src="/public/img/logo.svg" style="width:50px; height:50px; border-radius:25px; background: linear-gradient(135deg, #ff7eb9, #ff758c); color:#fff; font-size:22px; font-weight:700; box-shadow:0 6px 14px rgba(0,0,0,0.2); transition: transform 0.2s;" />
-              </a>
-            </div>
+        <!-- 插入弹窗组件 -->
+        <component :is="JmDetailModal"/>
+        <component :is="JmBottomBarComponent"/>
       </div>
     `,
         setup() {
@@ -113,10 +84,11 @@ export function createTaskTable(Vue, naive) {
                 currentError.value = msg
                 showErrorModal.value = true
             }
-            const isTop = ref(true)
-            const isBottom = ref(false)
-            const hoverBtn = ref(false)
-            const hoverTopBtn = ref(false)
+            const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')
+            watch(privacyMode, val => localStorage.setItem('privacyMode', val))
+
+            const JmDetailModal = createJmDetailModal(naive, privacyMode)
+            const JmBottomBarComponent= createJmBottomBarComponent(naive)
             const openIdModal = (msg) => {
                 currentId.value = msg
                 showIdModal.value = true
@@ -136,23 +108,9 @@ export function createTaskTable(Vue, naive) {
                     message.error(res.message || '重试任务失败')
                 }
             }
-            const goBottom = () => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})
-            const goTop = () => window.scrollTo({top: 0, behavior: 'smooth'})
-            const handleScroll = () => {
-                const scrollTop = window.scrollY
-                const windowHeight = window.innerHeight
-                const bodyHeight = document.body.scrollHeight
-                isTop.value = scrollTop < 50
-                isBottom.value = scrollTop + windowHeight >= bodyHeight - 50
-            }
-            onMounted(() => {
-                window.addEventListener('scroll', handleScroll)
-                handleScroll() // 初始化状态
-            })
 
-            onBeforeUnmount(() => {
-                window.removeEventListener('scroll', handleScroll)
-            })
+
+
             const columns = [
                 {
                     title: '任务ID',
@@ -171,9 +129,10 @@ export function createTaskTable(Vue, naive) {
                     align: 'center',
                     render(row) {
                         const shortText = row.result.item_id
-                        return h('a', {
+                        return h('p', {
                             style: {cursor: 'pointer', color: '#ff7eb9'},
-                            href: 'https://18comic.vip/album/' + shortText
+                            onClick: () => JmDetailModal.setup().showDetail(row.result.item_id)
+
                         }, shortText)
                     }
                 },
@@ -301,12 +260,8 @@ export function createTaskTable(Vue, naive) {
                 currentError,
                 themeOverrides,
                 loadingBar,
-                isTop,
-                isBottom,
-                hoverBtn,
-                hoverTopBtn,
-                goTop,
-                goBottom
+                JmBottomBarComponent,
+                JmDetailModal
             }
         },
         components: {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination}

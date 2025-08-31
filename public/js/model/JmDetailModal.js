@@ -14,8 +14,6 @@ export function createJmDetailModal(naive, privacyModeRef) {
     const hoverBtn = ref(false)
     const hoverBtnView = ref(false)
 
-    const message = useMessage()
-    const loadingBar = useLoadingBar()
 
     const showDetail = async (jmId) => {
         detail.value = null
@@ -33,27 +31,7 @@ export function createJmDetailModal(naive, privacyModeRef) {
         }
     }
 
-    const handleDownload = (jmId) => {
-        message.info(`下载任务进入队列: #${jmId}`)
-        loadingBar.start()
-        downloadById([jmId]).then(res => {
-            if (res.code === 200) {
-                loadingBar.finish()
-            } else {
-                loadingBar.error()
-                message.error(res.message || '下载失败')
-            }
-        })
-    }
 
-    const handleView = (jmId) => {
-        window.open(`https://18comic.vip/album/${jmId}`, '_blank')
-    }
-
-    const showPreview = (src) => {
-        previewSrc.value = privacyModeRef.value ? '/public/img/logo.webp' : src
-        previewVisible.value = true
-    }
 
     const JmDetailModalComponent = {
         template: `
@@ -127,6 +105,30 @@ export function createJmDetailModal(naive, privacyModeRef) {
         </n-modal>
         `,
         setup() {
+            const loadingBar = useLoadingBar()
+
+            const message = useMessage()
+            const handleDownload = (jmId) => {
+            message.info(`下载任务进入队列: #${jmId}`)
+                loadingBar.start()
+                downloadById([jmId]).then(res => {
+                        if (res.code === 200) {
+                            loadingBar.finish()
+                        } else {
+                            loadingBar.error()
+                            message.error(res.message || '下载失败')
+                        }
+                    })
+                }
+
+            const handleView = (jmId) => {
+                window.open(`https://18comic.vip/album/${jmId}`, '_blank')
+            }
+
+            const showPreview = (src) => {
+                previewSrc.value = privacyModeRef.value ? '/public/img/logo.webp' : src
+                previewVisible.value = true
+            }
             return {
                 detailVisible, detail, detailLoading,
                 previewVisible, previewSrc, hoverBtn, hoverBtnView,

@@ -1,7 +1,7 @@
 import {themeOverrides} from '../utils/theme.js'
 import {fetchJmList} from '../api/jmService.js'
 import {createJmDetailModal} from '/public/js/model/JmDetailModal.js'
-
+import {createJmBottomBarComponent} from '/public/js/model/JmBottomBarComponent.js'
 export function createJmListPage(Vue, naive) {
     const {ref, onMounted, computed, onBeforeUnmount, watch} = Vue
     const {NCard, NConfigProvider, NButton, NPagination, NSpin, NSwitch} = naive
@@ -10,7 +10,7 @@ export function createJmListPage(Vue, naive) {
     watch(privacyMode, val => localStorage.setItem('privacyMode', val))
 
     const JmDetailModal = createJmDetailModal(naive, privacyMode)
-
+    const JmBottomBarComponent= createJmBottomBarComponent(naive)
     return {
         template: `
         <n-config-provider :theme-overrides="themeOverrides">
@@ -52,6 +52,7 @@ export function createJmListPage(Vue, naive) {
 
             <!-- 插入弹窗组件 -->
             <component :is="JmDetailModal"/>
+            <component :is="JmBottomBarComponent"/>
           </div>
         </n-config-provider>
         `,
@@ -90,7 +91,7 @@ export function createJmListPage(Vue, naive) {
 
             onMounted(fetchList)
 
-            return {items, page, pageTitle, totalPages, fetchList, goBack, cardStyle, loading, JmDetailModal, privacyMode, themeOverrides}
+            return {items, page, pageTitle, totalPages, fetchList, goBack, cardStyle, loading, JmBottomBarComponent, privacyMode, themeOverrides, JmDetailModal}
         },
         components: {NCard, NConfigProvider, NButton, NPagination, NSpin, NSwitch}
     }
