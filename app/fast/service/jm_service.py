@@ -6,7 +6,7 @@ from app.utils.logger_utils import logger
 helper = SearchHelper()
 
 def get_item(jm_id: int):
-    item, photo = helper.get(jm_id)
+    item = helper.get(jm_id)
     return {
         "jm_id":item.album_id,
         "scramble_id":item.scramble_id,
@@ -23,7 +23,7 @@ def get_item(jm_id: int):
         "tags":item.tags,
         "related_list":item.related_list,
         "description":item.description,
-        "img_url":photo.img_url
+        "img_url": f'https://cdn-msp2.18comic.vip/media/albums/{item.album_id}.jpg?u=1756608084'
     }
 
 

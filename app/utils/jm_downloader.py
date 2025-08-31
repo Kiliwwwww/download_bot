@@ -49,14 +49,9 @@ class SearchHelper:
 
     def get(self,jm_id: int):
         album: JmAlbumDetail = client.get_album_detail(f'{jm_id}')
-        photo = client.get_photo_detail(album.album_id, False).create_image_detail(0)
-        if not photo:
-            logger.info("没有photo")
-        else:
-            logger.info(photo)
         if not album:
             raise "未找到数据"
-        return [album, photo]
+        return album
 
     def search(self, page, time, category, order_by):
         return list_for_type(page, time, category, order_by)
