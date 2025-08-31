@@ -122,9 +122,16 @@ export function createJmListPage(Vue, naive) {
                       <img 
                         :src="privacyMode ? '/public/img/logo.webp' : detail.img_url" 
                         alt="封面" 
-                        style="width:100%; max-width:260px; border-radius:14px; box-shadow:0 6px 20px rgba(0,0,0,0.15);" 
+                        style="width:100%; max-width:260px; border-radius:14px; box-shadow:0 6px 20px rgba(0,0,0,0.15); cursor:pointer;"
+                        @click="showPreview(detail.img_url)" 
                       />
                     </div>
+                    
+                    <!-- 全屏预览弹窗 -->
+                    <n-modal v-model:show="previewVisible" style="padding:0; max-width:95vw;" :mask-closable="true">
+                      <img :src="previewSrc" style="height:100%; height:auto; display:block;"/>
+                    </n-modal>
+
                     
                     <!-- 右侧信息 -->
                     <div style="flex:1; display:flex; flex-direction:column; gap:12px;">
@@ -211,7 +218,7 @@ export function createJmListPage(Vue, naive) {
             const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')  // 默认读取
 
             watch(privacyMode, (val) => {
-              localStorage.setItem('privacyMode', val)  // 每次修改存储
+                localStorage.setItem('privacyMode', val)  // 每次修改存储
             })
             const typeMap = {
                 last: '最新漫画',
@@ -238,7 +245,7 @@ export function createJmListPage(Vue, naive) {
             }
 
             const handleView = (jmId) => {
-              window.open(`https://18comic.vip/album/${jmId}`, '_blank') // 假设你有详情页
+                window.open(`https://18comic.vip/album/${jmId}`, '_blank') // 假设你有详情页
             }
             const fetchList = async () => {
                 loading.value = true
@@ -306,6 +313,21 @@ export function createJmListPage(Vue, naive) {
                 boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
                 transition: 'all 0.3s ease'
             }))
+            // 在setup()里新增状态
+            const previewVisible = ref(false)
+            const previewSrc = ref('')
+
+            // 点击图片时调用
+            const showPreview = (src) => {
+                if(privacyMode){
+                    previewSrc.value = '/public/img/logo.webp'
+                }else{
+                    previewSrc.value = src
+                }
+
+                previewVisible.value = true
+            }
+
 
             return {
                 items, page, perPage, total, hoverItem,
@@ -314,8 +336,8 @@ export function createJmListPage(Vue, naive) {
                 goBottom, goTop, isTop, isBottom,
                 hoverBtn, hoverTopBtn, hoverBack,
                 detailVisible, detail, detailLoading,
-                showDetail,handleDownload, handleView,
-                privacyMode
+                showDetail, handleDownload, handleView,
+                privacyMode, previewVisible, previewSrc,showPreview
             }
         },
         components: {NCard, NConfigProvider, NButton, NPagination, NSpin, NModal, NSwitch}
