@@ -4,9 +4,10 @@ import {themeOverrides} from '../utils/theme.js'
 import {retryById} from '../api/retryService.js'
 import {createJmDetailModal} from '/public/js/model/JmDetailModal.js'
 import {createJmBottomBarComponent} from '/public/js/model/JmBottomBarComponent.js'
+
 export function createTaskTable(Vue, naive) {
     const {ref, h, onMounted, onBeforeUnmount, watch} = Vue
-    const {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, useMessage, useLoadingBar} = naive
+    const {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, NSwitch, useMessage, useLoadingBar} = naive
 
     return {
         template: `
@@ -26,14 +27,20 @@ export function createTaskTable(Vue, naive) {
               </h2>
           <a href="/" style="position:absolute; top:20px; left:20px; color:#ff7eb9; font-weight:600; text-decoration:none;">返回主页</a>
           <!-- 隐私模式开关 -->
-          <div style="position:absolute; top:20px; right:20px; display:flex; align-items:center; gap:8px;">
-            <span style="font-size:14px; color:#ff7eb9; font-weight:600;">隐私模式</span>
-            <n-switch v-model:value="privacyMode" size="small"/>
+          <div style="position:absolute; top:20px; right:20px; display:flex; align-items:center; gap:12px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:14px; color:#ff7eb9; font-weight:600;">隐私模式</span>
+              <n-switch v-model:value="privacyMode" size="small"/>
+            </div>
           </div>
+
           <!-- 顶部操作区 -->
           <n-space justify="space-between" align="center" style="margin-bottom: 20px;">
-            <div style="display: flex; gap: 12px;">
-              <n-button type="primary" size="medium" :loading="loading" @click="loadTasks">刷新</n-button>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:14px; color:#ff7eb9; font-weight:600;">自动刷新</span>
+                <n-switch v-model:value="autoRefresh" size="small"/>
+              </div>
             </div>
             <n-text depth="3">共 {{ total }} 个任务</n-text>
           </n-space>
@@ -95,15 +102,32 @@ export function createTaskTable(Vue, naive) {
             const currentId = ref('')
             const message = useMessage()
             const loadingBar = useLoadingBar()
+
+            const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')
+            watch(privacyMode, val => localStorage.setItem('privacyMode', val))
+
+            const autoRefresh = ref(false)
+            let refreshTimer = null
+            watch(autoRefresh, (val) => {
+                if (val) {
+                    refreshTimer = setInterval(() => {
+                        loadTasks()
+                    }, 2500)
+                } else {
+                    if (refreshTimer) clearInterval(refreshTimer)
+                }
+            })
+            onBeforeUnmount(() => {
+                if (refreshTimer) clearInterval(refreshTimer)
+            })
+
+            const JmDetailModal = createJmDetailModal(naive, privacyMode)
+            const JmBottomBarComponent= createJmBottomBarComponent(naive)
+
             const openErrorModal = (msg) => {
                 currentError.value = msg
                 showErrorModal.value = true
             }
-            const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')
-            watch(privacyMode, val => localStorage.setItem('privacyMode', val))
-
-            const JmDetailModal = createJmDetailModal(naive, privacyMode)
-            const JmBottomBarComponent= createJmBottomBarComponent(naive)
             const openIdModal = (msg) => {
                 currentId.value = msg
                 showIdModal.value = true
@@ -124,9 +148,15 @@ export function createTaskTable(Vue, naive) {
                 }
             }
 
-
-
             const columns = [
+                {
+                    title: '序号',
+                    key: 'index',
+                    align: 'center',
+                    render(_, index) {
+                      return h('span',{ style: { color: '#ff7eb9'}},index + 1)
+                    }
+                },
                 {
                     title: '任务ID',
                     key: 'task_id',
@@ -147,7 +177,6 @@ export function createTaskTable(Vue, naive) {
                         return h('p', {
                             style: {cursor: 'pointer', color: '#ff7eb9'},
                             onClick: () => JmDetailModal.setup().showDetail(row.result.item_id)
-
                         }, shortText)
                     }
                 },
@@ -201,10 +230,7 @@ export function createTaskTable(Vue, naive) {
                                 onClick: () => openErrorModal(text)
                             }, shortText)
                         } else if (row.result && row.result.url) {
-                            return h('p', {
-                                style: {color: "#ff7eb9"}
-                            },  '下载完成')
-
+                            return h('p', {style: {color: "#ff7eb9"}}, '下载完成')
                         }
                         return null
                     }
@@ -221,9 +247,8 @@ export function createTaskTable(Vue, naive) {
                                 style: {color: '#409EFF', cursor: 'pointer'},
                                 onClick: () => retryTask(row)
                             }, '重试')
-                        }else{
+                        } else {
                             const fullUrl = window.location.origin + '/' + row.result.url
-
                             return h('a', {
                                 href: fullUrl,
                                 target: '_blank',
@@ -254,7 +279,6 @@ export function createTaskTable(Vue, naive) {
                 }
             }
 
-
             loadTasks()
 
             return {
@@ -273,9 +297,10 @@ export function createTaskTable(Vue, naive) {
                 loadingBar,
                 JmBottomBarComponent,
                 JmDetailModal,
-                privacyMode
+                privacyMode,
+                autoRefresh
             }
         },
-        components: {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination}
+        components: {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, NSwitch}
     }
 }
