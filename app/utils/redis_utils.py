@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Tuple
 
 
 JM_KEY = "jm_id:download_id_hash"
+JM_CACHE_KEY = "jm_cache:"
 CELERY_TASK_META = "celery-task-meta"
 
 class RedisUtils:
