@@ -5,19 +5,34 @@ import {retryById} from '../api/retryService.js'
 import {createJmDetailModal} from '/public/js/model/JmDetailModal.js'
 import {createJmBottomBarComponent} from '/public/js/model/JmBottomBarComponent.js'
 export function createTaskTable(Vue, naive) {
-    const {ref, h,onMounted, onBeforeUnmount, watch} = Vue
+    const {ref, h, onMounted, onBeforeUnmount, watch} = Vue
     const {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, useMessage, useLoadingBar} = naive
 
     return {
         template: `
       <div style="display: flex; justify-content: center; margin-top: 50px;">
         <n-card style="width: 1100px; padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;" 
-                title="任务队列" size="huge" :bordered="false">
-          
+                size="huge" :bordered="false">
+                 <h2 style="
+                font-weight: 800;
+                font-size: 26px;
+                background: linear-gradient(90deg, #ff7eb9, #ff758c);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                text-align: center;
+                margin-bottom: 10px;
+              ">
+                任务队列
+              </h2>
+          <a href="/" style="position:absolute; top:20px; left:20px; color:#ff7eb9; font-weight:600; text-decoration:none;">返回主页</a>
+          <!-- 隐私模式开关 -->
+          <div style="position:absolute; top:20px; right:20px; display:flex; align-items:center; gap:8px;">
+            <span style="font-size:14px; color:#ff7eb9; font-weight:600;">隐私模式</span>
+            <n-switch v-model:value="privacyMode" size="small"/>
+          </div>
           <!-- 顶部操作区 -->
           <n-space justify="space-between" align="center" style="margin-bottom: 20px;">
             <div style="display: flex; gap: 12px;">
-              <n-button type="primary" size="medium" @click="openDownloadPage">返回下载</n-button>
               <n-button type="primary" size="medium" :loading="loading" @click="loadTasks">刷新</n-button>
             </div>
             <n-text depth="3">共 {{ total }} 个任务</n-text>
@@ -239,9 +254,6 @@ export function createTaskTable(Vue, naive) {
                 }
             }
 
-            const openDownloadPage = () => {
-                window.location.href = '/admins/pages/download.html'
-            }
 
             loadTasks()
 
@@ -253,7 +265,6 @@ export function createTaskTable(Vue, naive) {
                 loading,
                 columns,
                 loadTasks,
-                openDownloadPage,
                 showErrorModal,
                 showIdModal,
                 currentId,
@@ -261,7 +272,8 @@ export function createTaskTable(Vue, naive) {
                 themeOverrides,
                 loadingBar,
                 JmBottomBarComponent,
-                JmDetailModal
+                JmDetailModal,
+                privacyMode
             }
         },
         components: {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination}
