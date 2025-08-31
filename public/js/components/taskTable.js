@@ -14,17 +14,17 @@ export function createTaskTable(Vue, naive) {
       <div style="display: flex; justify-content: center; margin-top: 50px;">
         <n-card style="width: 1100px; padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;" 
                 size="huge" :bordered="false">
-                 <h2 style="
-                font-weight: 800;
-                font-size: 26px;
-                background: linear-gradient(90deg, #ff7eb9, #ff758c);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                text-align: center;
-                margin-bottom: 10px;
-              ">
-                任务队列
-              </h2>
+         <h2 style="
+            font-weight: 800;
+            font-size: 26px;
+            background: linear-gradient(90deg, #ff7eb9, #ff758c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 10px;
+          ">
+            任务队列
+          </h2>
           <a href="/" style="position:absolute; top:20px; left:20px; color:#ff7eb9; font-weight:600; text-decoration:none;">返回主页</a>
           <!-- 隐私模式开关 -->
           <div style="position:absolute; top:20px; right:20px; display:flex; align-items:center; gap:12px;">
