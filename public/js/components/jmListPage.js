@@ -1,11 +1,12 @@
 import {themeOverrides} from '../utils/theme.js'
 import {fetchJmList, fetchJmDetail} from '../api/jmService.js'
+import {downloadById} from '../api/downloadService.js'
 
 export function createJmListPage(Vue, naive) {
     const {ref, onMounted, computed, onBeforeUnmount} = Vue
     const {
         NCard, NConfigProvider, NButton, NPagination, NSpin,
-        useMessage, useLoadingBar, NModal
+        useMessage, useLoadingBar, NModal, NSwitch
     } = naive
 
     return {
@@ -13,6 +14,7 @@ export function createJmListPage(Vue, naive) {
       <n-config-provider :theme-overrides="themeOverrides">
         <div style="display:flex; flex-direction:column; align-items:center; margin-top: 60px; gap: 20px; margin-bottom: 60px;">
           <n-card :style="cardStyle">
+            
             <!-- 返回主页 -->
             <a 
               href="/" 
@@ -22,6 +24,12 @@ export function createJmListPage(Vue, naive) {
               :style="hoverBack ? 'color:#ff4d94; transform:scale(1.05);' : ''">
               返回主页
             </a>
+
+            <!-- 隐私模式开关 -->
+            <div style="position:absolute; top:20px; right:20px; display:flex; align-items:center; gap:8px;">
+              <span style="font-size:14px; color:#ff7eb9; font-weight:600;">隐私模式</span>
+              <n-switch v-model:value="privacyMode" size="small"/>
+            </div>
 
             <!-- 标题 -->
             <h2 style="
@@ -105,39 +113,71 @@ export function createJmListPage(Vue, naive) {
 
           <!-- 详情弹窗 -->
           <!-- 详情弹窗 -->
-            <n-modal v-model:show="detailVisible" style="width: 900px;">
+            <n-modal v-model:show="detailVisible" style="width: 920px; max-width:95vw;">
               <n-card :style="cardStyle" title="详情" closable @close="detailVisible=false">
                 <n-spin :show="detailLoading">
-                  <div v-if="detail" style="display:flex; gap:20px; align-items:flex-start;">
+                  <div v-if="detail" style="display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;">
                     
                     <!-- 左侧图片 -->
                     <div style="flex:0 0 260px; text-align:center;">
                       <img 
-                        :src="detail.img_url" 
+                        :src="privacyMode ? '/public/img/logo.webp' : detail.img_url" 
                         alt="封面" 
-                        style="width:100%; max-width:240px; border-radius:12px; box-shadow:0 6px 16px rgba(0,0,0,0.15);" 
+                        style="width:100%; max-width:260px; border-radius:14px; box-shadow:0 6px 20px rgba(0,0,0,0.15);" 
                       />
                     </div>
                     
                     <!-- 右侧信息 -->
-                    <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
-                      <h3 style="font-size:20px; font-weight:700; color:#ff7eb9; margin:0;">
+                    <div style="flex:1; display:flex; flex-direction:column; gap:12px;">
+                      <h3 style="font-size:22px; font-weight:700; color:#ff7eb9; margin:0;">
                         #{{ detail.jm_id }} - {{ detail.name }}
                       </h3>
-                      <p style="margin:0; font-size:14px; color:#666;">作者: {{ detail.authors.join(', ') || '未知' }}</p>
-                      <p style="margin:0; font-size:14px; color:#666;">上传时间: {{ detail.pub_date }}</p>
-                      <p style="margin:0; font-size:14px; color:#666;">更新时间: {{ detail.update_date }}</p>
-                      <p style="margin:0; font-size:14px; color:#666;">页数: {{ detail.page_count }}</p>
-                      <p style="margin:0; font-size:14px; color:#666;">点赞: {{ detail.likes }} | 游览: {{ detail.views }} | 评论: {{ detail.comment_count }}</p>
-                      <p style="margin:0; font-size:14px; color:#666;">标签: {{ detail.tags.join(', ') || '无' }}</p>
                       
+                      <!-- 基本信息 -->
+                      <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:14px; color:#666;">
+                        <span>作者: {{ detail.authors.join(', ') || '未知' }}</span>
+                        <span>上传时间: {{ detail.pub_date }}</span>
+                        <span>更新时间: {{ detail.update_date }}</span>
+                        <span>页数: {{ detail.page_count }}</span>
+                        <span>点赞: {{ detail.likes }} | 浏览: {{ detail.views }} | 评论: {{ detail.comment_count }}</span>
+                      </div>
+            
+                      <!-- 标签 -->
+                      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;">
+                        <span 
+                          v-for="tag in detail.tags" 
+                          :key="tag"
+                          style="background: linear-gradient(90deg,#ff7eb9,#ff758c); color:#fff; padding:2px 10px; border-radius:12px; font-size:12px;"
+                        >
+                          {{ tag }}
+                        </span>
+                        <span v-if="!detail.tags.length" style="color:#999;">无标签</span>
+                      </div>
+            
                       <!-- 简介 -->
                       <div v-if="detail.description" 
-                           style="margin-top:10px; max-height:150px; overflow-y:auto; padding:10px; border-radius:8px; background:#fff0f6; box-shadow:inset 0 2px 6px rgba(0,0,0,0.05); font-size:14px; line-height:1.6; color:#444;">
+                           style="margin-top:10px; max-height:180px; overflow-y:auto; padding:12px; border-radius:10px; background:#fff0f6; box-shadow:inset 0 2px 6px rgba(0,0,0,0.05); font-size:14px; line-height:1.6; color:#444;">
                         {{ detail.description }}
                       </div>
-                    </div>
             
+                      <!-- 操作按钮 -->
+                      <div style="margin-top:18px; display:flex; gap:14px;">
+                        <n-button 
+                          style="flex:1; padding:10px 16px; font-size:15px; border-radius:12px; background:linear-gradient(90deg, #ff7eb9, #ff758c); color:#fff; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,0.15); transition: transform 0.2s;" 
+                          @mouseover.native="hoverBtn = true" @mouseleave.native="hoverBtn=false"
+                          :style="hoverBtn ? 'transform:scale(1.05);' : ''"
+                          @click="handleDownload(detail.jm_id)">
+                          ⬇ 下载
+                        </n-button>
+                        <n-button 
+                          style="flex:1; padding:10px 16px; font-size:15px; border-radius:12px; background:linear-gradient(90deg, #7ebfff, #758cff); color:#fff; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,0.15); transition: transform 0.2s;" 
+                          @mouseover.native="hoverBtnView = true" @mouseleave.native="hoverBtnView=false"
+                          :style="hoverBtnView ? 'transform:scale(1.05);' : ''"
+                          @click="handleView(detail.jm_id)">
+                          🔍 查看详情
+                        </n-button>
+                      </div>
+                    </div>
                   </div>
                   <div v-else style="color:#999; text-align:center; padding:40px 0;">暂无详情</div>
                 </n-spin>
@@ -168,6 +208,9 @@ export function createJmListPage(Vue, naive) {
             const detail = ref(null)
             const detailLoading = ref(false)
 
+            // 隐私模式
+            const privacyMode = ref(false)
+
             const typeMap = {
                 last: '最新漫画',
                 view: '游览最高',
@@ -179,6 +222,22 @@ export function createJmListPage(Vue, naive) {
             const totalPages = computed(() => Math.ceil(total.value / perPage.value))
             const loadingBar = useLoadingBar()
 
+            const handleDownload = (jmId) => {
+                message.info(`下载任务进入队列: #${jmId}`)
+                loadingBar.start()
+                downloadById([jmId]).then(res => {
+                    if (res.code === 200) {
+                        loadingBar.finish()
+                    } else {
+                        loadingBar.error()
+                        message.error(res.message || '下载失败')
+                    }
+                })
+            }
+
+            const handleView = (jmId) => {
+              window.open(`https://18comic.vip/album/${jmId}`, '_blank') // 假设你有详情页
+            }
             const fetchList = async () => {
                 loading.value = true
                 try {
@@ -199,6 +258,7 @@ export function createJmListPage(Vue, naive) {
             }
 
             const showDetail = async (jmId) => {
+                detail.value = null
                 detailVisible.value = true
                 detailLoading.value = true
                 try {
@@ -252,9 +312,10 @@ export function createJmListPage(Vue, naive) {
                 goBottom, goTop, isTop, isBottom,
                 hoverBtn, hoverTopBtn, hoverBack,
                 detailVisible, detail, detailLoading,
-                showDetail
+                showDetail,handleDownload, handleView,
+                privacyMode
             }
         },
-        components: {NCard, NConfigProvider, NButton, NPagination, NSpin, NModal}
+        components: {NCard, NConfigProvider, NButton, NPagination, NSpin, NModal, NSwitch}
     }
 }
