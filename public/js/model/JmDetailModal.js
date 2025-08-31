@@ -36,7 +36,7 @@ export function createJmDetailModal(naive, privacyModeRef) {
     const JmDetailModalComponent = {
         template: `
         <n-modal v-model:show="detailVisible" style="width: 920px; max-width:95vw;">
-          <n-card title="详情" closable @close="detailVisible=false">
+          <n-card title="漫画详情" closable @close="detailVisible=false">
             <n-spin :show="detailLoading">
               <div v-if="detail" style="display:flex; gap:24px; flex-wrap:wrap; align-items:flex-start;">
                 <!-- 左侧图片 -->

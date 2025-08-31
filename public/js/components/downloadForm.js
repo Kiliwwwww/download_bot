@@ -149,10 +149,10 @@ export function createDownloadForm(Vue, naive) {
 
           <p style="margin-top: 10px; font-size: 14px; color: #ff7eb9; text-align: center; line-height: 1.6; max-width: 500px;">
              大家好（ﾉ>ω<)ﾉ 这里是下载bot酱网页版！<br>
-             可下载JMComic内的本子，欢迎大家来测试！<br>
+             可下载JMComic内的漫画，欢迎大家来测试！<br>
              小提示: 只能用JMComic地址上的数字id下载<br>
              如果大家觉得好用的话就请麻烦宣传和赞助一下！<br>
-             PS.目前只能下载JMComic内的本子呀！别的网站的暂时未收录<br>
+             PS.目前只能下载JMComic内的漫画呀！别的网站的暂时未收录<br>
              <br>
              <a href="/admins/pages" style="font-weight: 500;">前往任务队列 →</a><br>
           </p>

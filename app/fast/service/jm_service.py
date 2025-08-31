@@ -37,7 +37,7 @@ def get_item(jm_id: int):
         "img_url": f'https://cdn-msp2.18comic.vip/media/albums/{item.album_id}.jpg?u=1756608084'
     }
 
-    # 3. 写入缓存，有效期 1 小时
+    # 3. 写入缓存，有效期 1 天
     redis_utils.set(cache_key, json.dumps(data), ex=86400)
 
     return data
