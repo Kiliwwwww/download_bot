@@ -15,7 +15,7 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 def sync_all_file_finished_count():
     data = []
     try:
-        data = TaskRecord.objects().where_expr(TaskRecord.total_count != TaskRecord.finished_count).pluck("id","item_id")
+        data = TaskRecord.objects().where_expr(TaskRecord.total_count != TaskRecord.finished_count).where_expr(TaskRecord.status != "SUCCESS").pluck("id","item_id")
         if data:
             for task_id, jm_id in data:
                 sync_file_size(task_id, jm_id)
