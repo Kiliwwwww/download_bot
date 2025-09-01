@@ -8,6 +8,11 @@ from app.utils.redis_utils import RedisUtils, JM_CACHE_KEY
 
 helper = SearchHelper()
 redis_utils = RedisUtils()
+
+
+def keyword_search(name:str, page=1):
+    return helper.keyword_search(name=name, page=page)
+
 def get_item(jm_id: int):
     cache_key = f"{JM_CACHE_KEY}{jm_id}"
 

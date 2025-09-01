@@ -1,5 +1,5 @@
 import jmcomic
-from jmcomic import download_album, JmOption, JmCategoryPage, JmMagicConstants, JmAlbumDetail
+from jmcomic import download_album, JmOption, JmCategoryPage, JmMagicConstants, JmAlbumDetail, JmSearchPage
 from app.utils.logger_utils import logger
 from app.utils.yaml_config import config, jm_downloader, JM_CONFIG_FILE
 from app.utils.zip_utils import ZipUtils
@@ -46,6 +46,12 @@ def download_and_zip(jm_id: int) -> str:
 class SearchHelper:
     def __init__(self):
         return
+
+    def keyword_search(self,name:str, page=1):
+        page: JmSearchPage = client.search_site(search_query=name, page=page)
+        logger.info(f'结果总数: {page.total}, 分页大小: {page.page_size}，页数: {page.page_count}')
+        return page
+
 
     def get(self,jm_id: int):
         album: JmAlbumDetail = client.get_album_detail(f'{jm_id}')
