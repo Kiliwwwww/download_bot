@@ -7,7 +7,7 @@ import {createJmBottomBarComponent} from '/public/js/model/JmBottomBarComponent.
 
 export function createTaskTable(Vue, naive) {
     const {ref, h, onMounted, onBeforeUnmount, watch} = Vue
-    const {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, NSwitch, useMessage, useLoadingBar} = naive
+    const {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, NSwitch, NProgress, useMessage, useLoadingBar} = naive
 
     return {
         template: `
@@ -198,6 +198,23 @@ export function createTaskTable(Vue, naive) {
                     }
                 },
                 {
+                    title: '下载进度',
+                    key: 'progress',
+                    align: 'center',
+                    render(row) {
+                        const finished = row.finished_count || 0
+                        const total = row.total_count || 0
+                        const percent = total > 0 ? Math.floor((finished / total) * 100) : 0
+                        return h(NProgress, {
+                            percentage: percent,
+                            type: 'line',
+                            indicatorPlacement:"inside",
+                            style: {  },
+                            color: "#ff7eb9"
+                        })
+                    }
+                },
+                {
                     title: '开始时间',
                     key: 'start_time',
                     align: 'center',
@@ -301,6 +318,6 @@ export function createTaskTable(Vue, naive) {
                 autoRefresh
             }
         },
-        components: {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, NSwitch}
+        components: {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, NSwitch, NProgress}
     }
 }

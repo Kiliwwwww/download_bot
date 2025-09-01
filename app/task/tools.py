@@ -2,12 +2,15 @@ from datetime import datetime
 
 from app.fast.service.download_service import download_jm_comic
 from app.model.task_record import TaskRecord
+from app.task.sync_file_size_task import sync_file_size
 from app.utils.logger_utils import logger
 
 
 def download(jm_comic_id: int, task_id: str):
     try:
         url = download_jm_comic(jm_comic_id)
+        # 同步下载进度
+        sync_file_size(task_id, jm_comic_id)
     except Exception as e:
         logger.info(str(e))
         TaskRecord.update_record({"task_id": task_id}, status="ERROR", end_time=datetime.now(),
