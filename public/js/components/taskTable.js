@@ -202,8 +202,11 @@ export function createTaskTable(Vue, naive) {
                     key: 'progress',
                     align: 'center',
                     render(row) {
-                        const finished = row.finished_count || 0
+                        let finished = row.finished_count || 0
                         const total = row.total_count || 0
+                        if(row.status === 'SUCCESS'){
+                            finished = total
+                        }
                         const percent = total > 0 ? Math.floor((finished / total) * 100) : 0
                         return h(NProgress, {
                             percentage: percent,
