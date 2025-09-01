@@ -25,6 +25,7 @@ def start_download(jm_comic_id: int):
                                  "item_id": jm_comic_id,
                                  "url": ""
                              },
+                             item_id=jm_comic_id,
                              user_id=1,
                              total_count=page_count,
                              finished_count=0)

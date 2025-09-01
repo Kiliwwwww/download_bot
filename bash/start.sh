@@ -59,7 +59,7 @@ check_file() {
 
 check_file "config/config.yml"
 check_file "config/jm_downloader.yml"
-check_file "app.sqlite"
+#check_file "app.sqlite"
 check_file "Procfile"
 
 log_info "所有关键文件已就绪"
