@@ -213,7 +213,8 @@ export function createTaskTable(Vue, naive) {
                             type: 'line',
                             indicatorPlacement:"inside",
                             style: {  },
-                            color: "#ff7eb9"
+                            color: "#ff7eb9",
+                            processing:true
                         })
                     }
                 },
