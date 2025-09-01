@@ -41,6 +41,7 @@ build/
 books/
 zip/
 log/
+test/
 Procfile
 # Mac 系统文件
 .DS_Store
@@ -52,7 +53,7 @@ Procfile
 ehthumbs.db
 Thumbs.db
 app.sqlite
-test.py
+test/test.py
 
 config/config.yml
 config/jm_downloader.yml
