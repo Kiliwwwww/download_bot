@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>下载bot酱</title>
+    <link rel="icon" href="/public/img/logo.svg" type="image/x-icon">
+    <!-- Vue 3 -->
+    <script src="/public/vue.global.prod.js"></script>
+    <!-- Axios -->
+    <script src="/public/axios.min.js"></script>
+    <!-- Naive UI -->
+    <script src="/public/naive-ui.prod.js"></script>
+    <style>
+        html, body {
+            font-family: Arial;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        #app {
+            flex: 1; /* 占据剩余空间，把 footer 顶到底部 */
+        }
+
+        footer {
+            text-align: center;
+            color: #ff7eb9;
+            font-size: 14px;
+            padding: 10px 0;
+        }
+
+        .search-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 70vh;
+            padding-top: 80px;
+            padding-bottom: 40px;
+            transition: all 0.3s;
+        }
+
+        .logo {
+            width: 180px;
+            margin-bottom: 40px;
+            animation: logo-bounce 0.6s ease;
+        }
+
+        @keyframes logo-bounce {
+            0% {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            50% {
+                transform: translateY(10px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .search-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 50%;
+            max-width: 600px;
+        }
+
+        .search-input {
+            width: 80%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border-radius: 24px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            border: none;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .search-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px; /* 按钮间距 */
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-button {
+            background-color: #ff69b4;
+            color: #fff;
+            font-size: 16px;
+            padding: 10px 25px;
+            border-radius: 24px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-button:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .results {
+            margin-top: 30px;
+            width: 50%;
+            max-width: 600px;
+        }
+
+        .result-item {
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+
+    </style>
+</head>
+<body>
+<div id="app"></div>
+<footer>
+    © 2025 <a href="https://github.com/Kiliwwwww/download_bot" target="_blank"
+              style="color: #ff7eb9;text-decoration: none;">下载bot酱</a><br>
+    power by <a href="https://github.com/hect0x7/JMComic-Crawler-Python" target="_blank"
+                style="color: #ff7eb9;text-decoration: none;">hect0x7/JMComic-Crawler-Python</a>
+</footer>
+<script type="module">
+    import {createSearchPage} from '/public/js/components/searchPage.js'
+    import {themeOverrides} from '/public/js/utils/theme.js'
+
+    const {NMessageProvider} = naive
+
+    const App = {
+        template:
+                `
+                  <n-config-provider :theme-overrides="themeOverrides">
+                    <n-loading-bar-provider>
+                      <n-message-provider>
+                        <search-page/>
+                      </n-message-provider>
+                    </n-loading-bar-provider>
+                  </n-config-provider>
+                `,
+        components: {
+            'search-page': createSearchPage(Vue, naive),
+            NMessageProvider
+        },
+        setup() {
+            return {
+                themeOverrides
+            }
+        }
+    }
+
+    const app = Vue.createApp(App)
+    app.use(naive, {
+        themeOverrides
+    })
+    app.mount('#app')
+</script>
+</body>
+</html>
