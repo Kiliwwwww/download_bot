@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 from time import sleep
 
@@ -20,7 +21,7 @@ def sync_all_file_finished_count():
                 sync_file_size(task_id, jm_id)
     except Exception as e:
         logger.error(str(e))
-    JobItem.update_record({"task_type":SYNC_FINISHED_COUNT},status="finished")
+    JobItem.update_record({"task_type":SYNC_FINISHED_COUNT},status="finished",updated_at=datetime.datetime.now())
     return data
 
 def sync_file_size(task_id, jm_id):
