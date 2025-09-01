@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from app.fast.service.jm_service import get_item
 from app.task.download_task import download_item
 from app.model.task_record import TaskRecord
 from app.rq.rq_utils import RQManager
@@ -9,6 +10,11 @@ rq_manager = RQManager()
 
 def start_download(jm_comic_id: int):
     logger.info(f"jm_comic_id: {jm_comic_id}")
+    jm_comic_data = get_item(jm_comic_id)
+    if jm_comic_data is None:
+        return jm_comic_id
+
+    page_count = int(jm_comic_data['page_count'])
     rq = rq_manager.enqueue(download_item, int(jm_comic_id))
     task_id = str(rq.id)
     logger.info(task_id)
@@ -19,7 +25,9 @@ def start_download(jm_comic_id: int):
                                  "item_id": jm_comic_id,
                                  "url": ""
                              },
-                             user_id=1)
+                             user_id=1,
+                             total_count=page_count,
+                             finished_count=0)
     return task_id
 
 

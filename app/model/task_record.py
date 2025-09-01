@@ -12,5 +12,8 @@ TaskRecord = DBManager.model("task_records", {
     "start_time": DateTimeField(null=True),  # 开始时间，可为空
     "end_time": DateTimeField(null=True),    # 完成时间，可为空
     "user_id": CharField(null=False),  # 用户id，非空
-    "result": JSONField(null=True)     # 结果，可为空，使用TextField适合较长内容
+    "result": JSONField(null=True),     # 结果，可为空，使用TextField适合较长内容
+    "total_count": IntegerField(null=True),
+    "finished_count": IntegerField(null=True)
+
 })

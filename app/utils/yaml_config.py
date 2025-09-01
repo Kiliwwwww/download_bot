@@ -1,9 +1,10 @@
+from pathlib import Path
+
 import yaml
 import os
-
-CONFIG_FILE = 'config/config.yml'
-JM_CONFIG_FILE = 'config/jm_downloader.yml'
-
+BASE_DIR = Path(__file__).resolve().parents[2]
+CONFIG_FILE = str(BASE_DIR / "config" / "config.yml")
+JM_CONFIG_FILE = str(BASE_DIR / "config" / "jm_downloader.yml")
 
 class YamlConfig:
     def __init__(self, file_path: str):

@@ -1,9 +1,10 @@
+from pathlib import Path
+
 from peewee import Model, SqliteDatabase
-import os
 
 from app.utils.logger_utils import logger
 from app.utils.yaml_config import config
-
+BASE_DIR = Path(__file__).resolve().parents[1]
 
 class DBManager:
     """
@@ -17,9 +18,7 @@ class DBManager:
         """初始化数据库连接（只执行一次）"""
         if cls._db is None:
             db_path = config.get("database.sqlite.database", "app.sqlite")
-            db_dir = os.path.dirname(db_path)
-            if db_dir and not os.path.exists(db_dir):
-                os.makedirs(db_dir)
+            db_path =  str(BASE_DIR / db_path)
             cls._db = SqliteDatabase(db_path)
 
     @classmethod
@@ -93,6 +92,33 @@ class QuerySet:
             # 格式化输出（带参数）
             str = "SQL:", sql % tuple(repr(p) for p in params)
             logger.info(str)
+
+    def select_fields(self, *fields):
+        """
+        选择查询的字段，例如：.select_fields('id', 'name')
+        """
+        columns = [getattr(self.model, f) for f in fields]
+        new_query = self.model.select(*columns).where(self.query._where) if hasattr(self.query,
+                                                                                    "_where") else self.model.select(
+            *columns)
+        return QuerySet(self.model, new_query)
+
+    def pluck(self, *fields):
+        """
+        类似 Rails 的 pluck，直接返回指定字段的值列表
+        使用示例：
+            TaskRecord.objects().pluck('id') -> [1, 2, 3]
+            TaskRecord.objects().pluck('id', 'name') -> [(1, 'Alice'), (2, 'Bob')]
+        """
+        columns = [getattr(self.model, f) for f in fields]
+        query = self.model.select(*columns).where(self.query._where) if hasattr(self.query,
+                                                                                "_where") else self.model.select(
+            *columns)
+        results = query.execute()
+        if len(columns) == 1:
+            return [getattr(r, fields[0]) for r in results]
+        else:
+            return [tuple(getattr(r, f) for f in fields) for r in results]
 
 class BaseModel(Model):
     class Meta:
