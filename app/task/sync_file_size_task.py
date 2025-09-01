@@ -1,7 +1,10 @@
 from pathlib import Path
 from time import sleep
 
+from rq import get_current_job
+
 from app.fast.service.file_service import file_size
+from app.model.job_item import JobItem, SYNC_FINISHED_COUNT
 from app.model.task_record import TaskRecord
 from app.utils.logger_utils import logger
 from app.utils.yaml_config import jm_downloader
@@ -9,10 +12,15 @@ from app.utils.yaml_config import jm_downloader
 ROOT_DIR = Path(__file__).resolve().parents[2]
 
 def sync_all_file_finished_count():
-    data = TaskRecord.objects().where_expr(TaskRecord.total_count != TaskRecord.finished_count).pluck("id","item_id")
-    if data:
-        for task_id, jm_id in data:
-            sync_file_size(task_id, jm_id)
+    data = []
+    try:
+        data = TaskRecord.objects().where_expr(TaskRecord.total_count != TaskRecord.finished_count).pluck("id","item_id")
+        if data:
+            for task_id, jm_id in data:
+                sync_file_size(task_id, jm_id)
+    except Exception as e:
+        logger.error(str(e))
+    JobItem.update_record({"task_type":SYNC_FINISHED_COUNT},status="finished")
     return data
 
 def sync_file_size(task_id, jm_id):
