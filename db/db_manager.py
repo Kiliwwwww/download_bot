@@ -64,6 +64,11 @@ class QuerySet:
         new_query = self.query.where(*(getattr(self.model, k) == v for k, v in kwargs.items()))
         return QuerySet(self.model, new_query)
 
+    def where_expr(self, *expressions):
+        """支持 Peewee 复杂条件表达式，例如 !=、>、<"""
+        new_query = self.query.where(*expressions)
+        return QuerySet(self.model, new_query)
+
     def order(self, *fields):
         new_query = self.query.order_by(*fields)
         return QuerySet(self.model, new_query)

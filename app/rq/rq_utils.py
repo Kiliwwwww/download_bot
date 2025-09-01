@@ -17,6 +17,23 @@ class RQManager:
         self.queues = {}
         self.default_queue = default_queue
 
+    def is_task_finished(self, func, queue_name=None):
+        """
+        判断某个任务函数是否已经执行完成
+        :param func: 任务函数对象
+        :param queue_name: 队列名称，不传则使用默认队列
+        :return: True/False
+        """
+        queue = self.get_queue(queue_name)
+        finished_registry = FinishedJobRegistry(queue.name, self.redis_conn)
+        # 获取所有已完成的 Job
+        finished_jobs = finished_registry.get_job_ids()
+        for job_id in finished_jobs:
+            job = Job.fetch(job_id, connection=self.redis_conn)
+            if job.func_name == f"{func.__module__}.{func.__name__}":
+                return True
+        return False
+
     def get_queue(self, name=None):
         """
         获取队列，如果不存在则创建
