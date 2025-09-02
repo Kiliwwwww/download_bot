@@ -1,9 +1,13 @@
 import { searchJmComic } from '../api/searchService.js'
-
+import {createJmDetailModal} from '/public/js/model/JmDetailModal.js'
+import {createJmBottomBarComponent} from '/public/js/model/JmBottomBarComponent.js'
 export function createSearchPage(Vue, naive) {
-    const { ref, onMounted } = Vue
-    const { NInput, NButton, NCard, useMessage, useLoadingBar } = naive
-
+    const { ref, onMounted, computed, watch } = Vue
+    const { NInput, NButton, NCard, useMessage, useLoadingBar, NPagination } = naive
+    const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')
+    watch(privacyMode, val => localStorage.setItem('privacyMode', val))
+    const JmDetailModal = createJmDetailModal(naive, privacyMode)
+    const JmBottomBarComponent= createJmBottomBarComponent(naive)
     return {
         template: `
         <div class="search-page">
@@ -43,14 +47,20 @@ export function createSearchPage(Vue, naive) {
                     v-for="item in results" 
                     :key="item.jm_id" 
                     class="result-item"
-                    @click="goToDownload(item.jm_id)"
+                    @click="JmDetailModal.setup().showDetail(item.jm_id)"
                     @mouseenter="hoverItem = item.jm_id"
                     @mouseleave="hoverItem = ''"
                     :style="{ background: hoverItem === item.jm_id ? '#ffe6f0' : '#fff' }"
                 >
                     <div>{{ item.title }}</div>
                 </n-card>
+                <div style="margin-top:20px; display:flex; justify-content:center;">
+                    <n-pagination v-model:page="page" :page-count="totalPages" @update:page="handleSearch"/>
+                </div>
             </div>
+             <!-- 插入弹窗组件 -->
+            <component :is="JmDetailModal"/>
+            <component :is="JmBottomBarComponent"/>
 
         </div>
         `,
@@ -61,7 +71,10 @@ export function createSearchPage(Vue, naive) {
             const message = useMessage()
             const loadingBar = useLoadingBar()
             const searchInput = ref(null)
-
+            const page = ref(1)
+            const total = ref(0)
+            const perPage = ref(80)
+            const totalPages = computed(() => Math.ceil(total.value / perPage.value))
             const filterInput = (value) => {
                 query.value = value.replace(/[^\w\u4e00-\u9fa5]/g, '')
             }
@@ -75,9 +88,10 @@ export function createSearchPage(Vue, naive) {
 
                 loadingBar.start()
                 try {
-                    const res = await searchJmComic(val)
+                    const res = await searchJmComic(val, page.value)
                     if (res.code === 200) {
                         results.value = res.data.items || []
+                        total.value = res.data.total
                         loadingBar.finish()
                     } else {
                         message.error(res.message || '搜索失败')
@@ -100,8 +114,8 @@ export function createSearchPage(Vue, naive) {
                 }
             })
 
-            return { query, results, hoverItem, handleSearch, filterInput, goToDownload, searchInput }
+            return { query, results, hoverItem, handleSearch, filterInput, goToDownload, searchInput, page, perPage, total, totalPages, JmDetailModal, JmBottomBarComponent}
         },
-        components: { NInput, NButton, NCard }
+        components: { NInput, NButton, NCard,NPagination }
     }
 }
