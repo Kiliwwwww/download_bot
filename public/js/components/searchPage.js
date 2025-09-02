@@ -16,7 +16,7 @@ export function createSearchPage(Vue, naive) {
         <div class="search-page">
 
             <!-- Logo -->
-            <img src="/public/img/logo.webp" alt="logo" class="logo" />
+            <img src="/public/img/searchlogo.png" alt="logo" class="logo"/>
 
             <!-- 搜索类型选项 -->
             <div class="search-types" style="display:flex; justify-content:center; gap:20px; margin:15px 0;">

@@ -39,7 +39,7 @@ export function createDownloadForm(Vue, naive) {
                 text-align: center;
                 margin-bottom: 10px;
               ">
-                下载bot酱
+               <img src="/public/img/searchlogo.png" style="height: 50px"/>
               </h2>
 
               <n-input
