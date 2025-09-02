@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from app.fast.service.download_service import clear_cache
 from app.fast.service.start_job_service import start_download, retry_download
 from app.utils.logger_utils import logger
 
@@ -59,19 +58,4 @@ def retry(items: RetryItem):
         return StandardResponse(
             code=500,
             message=f"创建任务失败: {str(e)}"
-        )
-
-
-@downloads_router.get("/clear", response_model=StandardResponse[dict])
-def clear():
-    try:
-        clear_cache()
-        return StandardResponse(
-            data={"status": "ok"}
-        )
-    except Exception as e:
-        logger.error(f"清除缓存失败: {str(e)}")
-        return StandardResponse(
-            code=500,
-            message=f"清除缓存失败: {str(e)}"
         )
