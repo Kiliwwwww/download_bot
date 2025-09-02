@@ -59,29 +59,21 @@ export function createJmDetailModal(naive, privacyModeRef) {
 
                   <!-- 基本信息 -->
                   
-                  <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:14px; color:#666;">
-                      <span>
-                            作者:
-                            <span style="margin-left: 5px">
-                                 <a v-for="tag in detail.authors" :key="tag" @click="goto('author',tag)"
-                                      style=" all: unset; cursor: pointer; text-decoration: none; background: linear-gradient(90deg,#ff7eb9,#ff758c); color:#fff; padding:2px 10px; border-radius:12px; font-size:12px;">
-                                  {{ tag }}
-                                </a>
-                                <a v-if="!detail.authors.length" style="color:#999;">未知</a> 
-                            </span>
-                      </span>
+                  <div style="display:flex; flex-wrap:wrap; gap:8px; font-size:14px; color:#666;">
+                    作者:
+                    <a v-for="tag in detail.authors" :key="tag" @click="goto('author',tag)"
+                          style="all: unset; cursor: pointer; text-decoration: none; background: linear-gradient(90deg,#ff7eb9,#ff758c); color:#fff; padding:2px 10px; border-radius:12px; font-size:12px;">
+                      {{ tag }}
+                    </a>
+                    <a v-if="!detail.authors.length" style="color:#999;">未知</a> 
                   </div>
-                  <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:14px; color:#666;">
-                      <span>
-                            主角:
-                            <span style="margin-left: 5px">
-                                 <a v-for="tag in detail.actors" :key="tag" @click="goto('actor',tag)"
-                                      style=" all: unset; cursor: pointer; text-decoration: none; background: linear-gradient(90deg,#ff7eb9,#ff758c); color:#fff; padding:2px 10px; border-radius:12px; font-size:12px;">
-                                  {{ tag }}
-                                </a>
-                                <a v-if="!detail.actors.length" style="color:#999;">未知</a> 
-                            </span>
-                      </span>
+                  <div style="display:flex; flex-wrap:wrap; gap:8px; font-size:14px; color:#666;">
+                    主角:
+                    <a v-for="tag in detail.actors" :key="tag" @click="goto('actor',tag)"
+                          style="all: unset; cursor: pointer; text-decoration: none; background: linear-gradient(90deg,#ff7eb9,#ff758c); color:#fff; padding:2px 10px; border-radius:12px; font-size:12px;">
+                      {{ tag }}
+                    </a>
+                    <a v-if="!detail.actors.length" style="color:#999;">未知</a> 
                   </div>
                   
                   <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:14px; color:#666;">
@@ -96,7 +88,7 @@ export function createJmDetailModal(naive, privacyModeRef) {
                   <!-- 标签 -->
                   <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;">
                     <a v-for="tag in detail.tags" :key="tag" @click="goto('tag',tag)"
-                          style=" all: unset; cursor: pointer; text-decoration: none; background: linear-gradient(90deg,#ff7eb9,#ff758c); color:#fff; padding:2px 10px; border-radius:12px; font-size:12px;">
+                          style="margin-left: 5px; all: unset; cursor: pointer; text-decoration: none; background: linear-gradient(90deg,#ff7eb9,#ff758c); color:#fff; padding:2px 10px; border-radius:12px; font-size:12px;">
                       {{ tag }}
                     </a>
                     <a v-if="!detail.tags.length" style="color:#999;">无标签</a>
