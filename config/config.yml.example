@@ -5,6 +5,8 @@ server:
   redis: 'redis://localhost:6379/2'
   port: 12345
   dashboard_port: 9181
+  #rq worker数量 处理异步任务的数量 服务器好可以开大点
+  work_size: 3
 database:
   type: sqlite
 #  mysql:
