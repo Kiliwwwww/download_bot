@@ -10,8 +10,17 @@ helper = SearchHelper()
 redis_utils = RedisUtils()
 
 
-def keyword_search(name:str, page=1):
-    return helper.keyword_search(name=name, page=page)
+def search(name:str, page=1, type:str ='keyword'):
+    if type == 'keyword':
+        return helper.keyword_search(name=name, page=page)
+    elif type == 'tag':
+        return helper.tag_search(tag=name, page=page)
+    elif type == 'author':
+        return helper.author_search(author=name, page=page)
+    elif type == 'actor':
+        return helper.actor_search(actor=name, page=page)
+    return []
+
 
 def get_item(jm_id: int):
     cache_key = f"{JM_CACHE_KEY}{jm_id}"

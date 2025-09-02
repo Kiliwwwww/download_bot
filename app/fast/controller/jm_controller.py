@@ -7,7 +7,7 @@ from pathlib import Path
 
 from fastapi.responses import FileResponse
 
-from app.fast.service.jm_service import jm_list, get_item, keyword_search
+from app.fast.service.jm_service import jm_list, get_item, search
 from app.utils.logger_utils import logger
 from app.utils.standard_responese import StandardResponse
 from app.utils.yaml_config import config
@@ -79,10 +79,10 @@ def get(jm_id: int):
         )
 
 @jm_router.get("/search", response_model=StandardResponse[dict])
-def keyword(name: str, page=1):
+def keyword(name: str, page=1, type:str ='keyword'):
     try:
         logger.info(f"page={page} type={type}")
-        items = keyword_search(name=name, page=page)
+        items = search(name=name, page=page,type=type)
         # 构造返回数据的函数
         return StandardResponse(data=build_response(items, page))
 

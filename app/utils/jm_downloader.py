@@ -47,6 +47,30 @@ class SearchHelper:
     def __init__(self):
         return
 
+    def actor_search(self,actor=str, page=1):
+        """
+        搜索album的登场角色 actor
+        """
+        page: JmSearchPage = client.search_actor(actor, page=page)
+        logger.info(f'结果总数: {page.total}, 分页大小: {page.page_size}，页数: {page.page_count}')
+        return page
+
+    def author_search(self,author=str, page=1):
+        """
+        搜索album的作者 author
+        """
+        page: JmSearchPage = client.search_author(author, page=page)
+        logger.info(f'结果总数: {page.total}, 分页大小: {page.page_size}，页数: {page.page_count}')
+        return page
+
+    def tag_search(self,tag=str, page=1):
+        """
+        搜索album的标签 tag
+        """
+        page: JmSearchPage = client.search_tag(tag, page=page)
+        logger.info(f'结果总数: {page.total}, 分页大小: {page.page_size}，页数: {page.page_count}')
+        return page
+
     def keyword_search(self,name:str, page=1):
         page: JmSearchPage = client.search_site(search_query=name, page=page)
         logger.info(f'结果总数: {page.total}, 分页大小: {page.page_size}，页数: {page.page_count}')
