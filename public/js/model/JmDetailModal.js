@@ -32,7 +32,6 @@ export function createJmDetailModal(naive, privacyModeRef) {
     }
 
 
-
     const JmDetailModalComponent = {
         template: `
         <n-modal v-model:show="detailVisible" style="width: 920px; max-width:95vw;">
@@ -59,8 +58,35 @@ export function createJmDetailModal(naive, privacyModeRef) {
                   </h3>
 
                   <!-- 基本信息 -->
+                  
                   <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:14px; color:#666;">
-                    <span>作者: {{ detail.authors.join(', ') || '未知' }}</span>
+                      <span>
+                            作者:
+                            <span style="margin-left: 5px">
+                                 <a v-for="tag in detail.authors" :key="tag" @click="goto('author',tag)"
+                                      style=" all: unset; cursor: pointer; text-decoration: none; background: linear-gradient(90deg,#ff7eb9,#ff758c); color:#fff; padding:2px 10px; border-radius:12px; font-size:12px;">
+                                  {{ tag }}
+                                </a>
+                                <a v-if="!detail.authors.length" style="color:#999;">未知</a> 
+                            </span>
+                      </span>
+                  </div>
+                  <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:14px; color:#666;">
+                      <span>
+                            主角:
+                            <span style="margin-left: 5px">
+                                 <a v-for="tag in detail.actors" :key="tag" @click="goto('actor',tag)"
+                                      style=" all: unset; cursor: pointer; text-decoration: none; background: linear-gradient(90deg,#ff7eb9,#ff758c); color:#fff; padding:2px 10px; border-radius:12px; font-size:12px;">
+                                  {{ tag }}
+                                </a>
+                                <a v-if="!detail.actors.length" style="color:#999;">未知</a> 
+                            </span>
+                      </span>
+                  </div>
+                  
+                  <div style="display:flex; flex-wrap:wrap; gap:12px; font-size:14px; color:#666;">
+                  
+                    
                     <span>上传时间: {{ detail.pub_date }}</span>
                     <span>更新时间: {{ detail.update_date }}</span>
                     <span>页数: {{ detail.page_count }}</span>
@@ -69,11 +95,11 @@ export function createJmDetailModal(naive, privacyModeRef) {
 
                   <!-- 标签 -->
                   <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;">
-                    <span v-for="tag in detail.tags" :key="tag"
-                          style="background: linear-gradient(90deg,#ff7eb9,#ff758c); color:#fff; padding:2px 10px; border-radius:12px; font-size:12px;">
+                    <a v-for="tag in detail.tags" :key="tag" @click="goto('tag',tag)"
+                          style=" all: unset; cursor: pointer; text-decoration: none; background: linear-gradient(90deg,#ff7eb9,#ff758c); color:#fff; padding:2px 10px; border-radius:12px; font-size:12px;">
                       {{ tag }}
-                    </span>
-                    <span v-if="!detail.tags.length" style="color:#999;">无标签</span>
+                    </a>
+                    <a v-if="!detail.tags.length" style="color:#999;">无标签</a>
                   </div>
 
                   <!-- 简介 -->
@@ -109,17 +135,17 @@ export function createJmDetailModal(naive, privacyModeRef) {
 
             const message = useMessage()
             const handleDownload = (jmId) => {
-            message.info(`下载任务进入队列: #${jmId}`)
+                message.info(`下载任务进入队列: #${jmId}`)
                 loadingBar.start()
                 downloadById([jmId]).then(res => {
-                        if (res.code === 200) {
-                            loadingBar.finish()
-                        } else {
-                            loadingBar.error()
-                            message.error(res.message || '下载失败')
-                        }
-                    })
-                }
+                    if (res.code === 200) {
+                        loadingBar.finish()
+                    } else {
+                        loadingBar.error()
+                        message.error(res.message || '下载失败')
+                    }
+                })
+            }
 
             const handleView = (jmId) => {
                 window.open(`https://18comic.vip/album/${jmId}`, '_blank')
@@ -129,11 +155,14 @@ export function createJmDetailModal(naive, privacyModeRef) {
                 previewSrc.value = privacyModeRef.value ? '/public/img/logo.webp' : src
                 previewVisible.value = true
             }
+            const goto = (type, q) => {
+                window.location.href = '/admins/pages/search.html?type=' + type + '&query=' + q
+            }
             return {
                 detailVisible, detail, detailLoading,
                 previewVisible, previewSrc, hoverBtn, hoverBtnView,
                 showDetail, handleDownload, handleView, showPreview,
-                privacyModeRef
+                privacyModeRef, goto
             }
         },
         components: {NModal, NCard, NButton, NSpin}
