@@ -160,8 +160,14 @@ export function createDownloadForm(Vue, naive) {
              如果大家觉得好用的话就请麻烦宣传和赞助一下！<br>
              PS.目前只能下载JMComic内的漫画呀！别的网站的暂时未收录<br>
              <br>
-             <a href="/admins/pages" style="font-weight: 500;">前往任务队列 →</a>&nbsp&nbsp&nbsp&nbsp
-             <a href="/admins/pages/search.html" style="font-weight: 500;">前往搜索页面 →</a><br>
+             <a href="/admins/pages" style="font-weight: 500; color: #ff7eb9; /* 未访问时默认蓝色，可自定义 */ text-decoration: underline; /* 强制保留下划线 */">
+              前往任务队列 →
+            </a>
+            &nbsp;&nbsp;&nbsp;&nbsp; <!-- 规范空格写法，用&nbsp;分隔更清晰 -->
+            <a href="/admins/pages/search.html" style="font-weight: 500; color: #ff7eb9; text-decoration: underline;">
+              前往搜索页面 →
+            </a>
+            <br>
           </p>
         </div>
         <!-- 插入弹窗组件 -->
