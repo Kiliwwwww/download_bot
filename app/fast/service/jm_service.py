@@ -4,20 +4,22 @@ from jmcomic import JmSearchPage
 
 from app.utils import *
 from app.utils.jm_downloader import SearchHelper
+from app.utils.logger_utils import logger
 from app.utils.redis_utils import RedisUtils, JM_CACHE_KEY
 
 helper = SearchHelper()
 redis_utils = RedisUtils()
 
 
-def search(name:str, page=1, type:str ='keyword'):
-    if type == 'keyword':
+def search(name:str, page=1, search_type:str ='keyword'):
+    logger.info(f"page={page} type={search_type}")
+    if search_type == 'keyword':
         return helper.keyword_search(name=name, page=page)
-    elif type == 'tag':
+    elif search_type == 'tag':
         return helper.tag_search(tag=name, page=page)
-    elif type == 'author':
+    elif search_type == 'author':
         return helper.author_search(author=name, page=page)
-    elif type == 'actor':
+    elif search_type == 'actor':
         return helper.actor_search(actor=name, page=page)
     return []
 

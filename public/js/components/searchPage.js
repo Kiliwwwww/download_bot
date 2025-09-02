@@ -1,13 +1,16 @@
 import { searchJmComic } from '../api/searchService.js'
-import {createJmDetailModal} from '/public/js/model/JmDetailModal.js'
-import {createJmBottomBarComponent} from '/public/js/model/JmBottomBarComponent.js'
+import { createJmDetailModal } from '/public/js/model/JmDetailModal.js'
+import { createJmBottomBarComponent } from '/public/js/model/JmBottomBarComponent.js'
+
 export function createSearchPage(Vue, naive) {
     const { ref, onMounted, computed, watch } = Vue
     const { NInput, NButton, NCard, useMessage, useLoadingBar, NPagination } = naive
     const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')
     watch(privacyMode, val => localStorage.setItem('privacyMode', val))
+
     const JmDetailModal = createJmDetailModal(naive, privacyMode)
-    const JmBottomBarComponent= createJmBottomBarComponent(naive,privacyMode)
+    const JmBottomBarComponent = createJmBottomBarComponent(naive, privacyMode)
+
     return {
         template: `
         <div class="search-page">
@@ -15,21 +18,31 @@ export function createSearchPage(Vue, naive) {
             <!-- Logo -->
             <img src="/public/img/logo.webp" alt="logo" class="logo" />
 
+            <!-- 搜索类型选项 -->
+            <div class="search-types" style="display:flex; justify-content:center; gap:20px; margin:15px 0;">
+                <n-button size="small" tertiary @click="setSearchType('keyword')">模糊查询</n-button>
+                <n-button size="small" tertiary @click="setSearchType('tag')">搜标签</n-button>
+                <n-button size="small" tertiary @click="setSearchType('author')">搜作者</n-button>
+                <n-button size="small" tertiary @click="setSearchType('actor')">搜主角</n-button>
+            </div>
+
             <!-- 搜索框 -->
             <div class="search-wrapper">
                 <n-input
                     ref="searchInput"
-                    v-model="query"
-                    placeholder="请输入漫画名称"
+                    v-model:value="queryInput"
+                    :placeholder="placeholder"
                     class="search-input"
-                    @input="filterInput"
                     @keyup.enter="handleSearch"
-                />
+                >
+                    <template #prefix>
+                        <span v-if="prefixText" style="color:#ff7eb9;">{{ prefixText }}</span>
+                    </template>
+                </n-input>
                 <div class="search-buttons">
                     <a href="#" @click="handleSearch" style="color:#ff7eb9">
                         JMComic搜索
                     </a>
-                    
                 </div>
             </div>
 
@@ -50,14 +63,17 @@ export function createSearchPage(Vue, naive) {
                     <n-pagination v-model:page="page" :page-count="totalPages" @update:page="handleSearch"/>
                 </div>
             </div>
-             <!-- 插入弹窗组件 -->
+
+            <!-- 插入弹窗组件 -->
             <component :is="JmDetailModal"/>
             <component :is="JmBottomBarComponent"/>
 
         </div>
         `,
         setup() {
-            const query = ref('')
+            const queryInput = ref('')
+            const prefixText = ref('')
+            const searchType = ref('')
             const results = ref([])
             const hoverItem = ref('')
             const message = useMessage()
@@ -67,20 +83,37 @@ export function createSearchPage(Vue, naive) {
             const total = ref(0)
             const perPage = ref(80)
             const totalPages = computed(() => Math.ceil(total.value / perPage.value))
-            const filterInput = (value) => {
-                query.value = value.replace(/[^\w\u4e00-\u9fa5]/g, '')
+
+            const placeholder = computed(() => {
+                if (searchType.value === 'tag') return '请输入标签'
+                if (searchType.value === 'author') return '请输入作者'
+                if (searchType.value === 'actor') return '请输入主角'
+                return '请输入漫画名称'
+            })
+
+            const setSearchType = (type) => {
+                searchType.value = type
+                queryInput.value = '' // 重置用户输入
+                if (type === 'tag') prefixText.value = '搜标签：'
+                if (type === 'author') prefixText.value = '搜作者：'
+                if (type === 'actor') prefixText.value = '搜主角：'
+                if (type === 'keyword') prefixText.value = ''
             }
 
             const handleSearch = async () => {
-                const val = query.value.trim()
-                if (!val) {
+                const val = queryInput.value.trim()
+                if (!val && !searchType.value) {
                     message.warning('请输入搜索内容')
                     return
                 }
 
                 loadingBar.start()
                 try {
-                    const res = await searchJmComic(val, page.value)
+                    const res = await searchJmComic({
+                        query: val,
+                        page: page.value,
+                        type: searchType.value || 'default'
+                    })
                     if (res.code === 200) {
                         results.value = res.data.items || []
                         total.value = res.data.total
@@ -100,14 +133,18 @@ export function createSearchPage(Vue, naive) {
             }
 
             onMounted(() => {
-                // 页面打开自动聚焦
                 if (searchInput.value) {
                     searchInput.value.focus()
                 }
             })
 
-            return { query, results, hoverItem, handleSearch, filterInput, goToDownload, searchInput, page, perPage, total, totalPages, JmDetailModal, JmBottomBarComponent}
+            return {
+                queryInput, prefixText, searchType, setSearchType,
+                results, hoverItem, handleSearch, searchInput,
+                page, perPage, total, totalPages, placeholder,
+                JmDetailModal, JmBottomBarComponent
+            }
         },
-        components: { NInput, NButton, NCard,NPagination }
+        components: { NInput, NButton, NCard, NPagination }
     }
 }

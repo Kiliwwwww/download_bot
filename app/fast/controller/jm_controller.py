@@ -79,10 +79,11 @@ def get(jm_id: int):
         )
 
 @jm_router.get("/search", response_model=StandardResponse[dict])
-def keyword(name: str, page=1, type:str ='keyword'):
+def keyword(name: str, page=1, search_type:str ='keyword'):
     try:
-        logger.info(f"page={page} type={type}")
-        items = search(name=name, page=page,type=type)
+        logger.info(f"page={page} type={search_type}")
+        items = search(name=name, page=page,search_type=search_type)
+        logger.info(f"items={items}")
         # 构造返回数据的函数
         return StandardResponse(data=build_response(items, page))
 
