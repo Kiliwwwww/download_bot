@@ -15,12 +15,7 @@ docker build -t jinman .
 ### 2️⃣ 运行容器并映射目录与端口
 
 ```bash
-docker run -it \
-  -v /code/jinman:/jinman \
-  -p 12345:12345 \
-  -p 9181:9181 \
-  --name jinman-container \
-  jinman
+docker run -it -v /git/jinman_pull_bot:/jinman -p 12345:12345 -p 9181:9181 --name jinman-container jinman bash
 ```
 
 解释：
