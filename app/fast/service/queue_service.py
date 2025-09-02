@@ -25,7 +25,7 @@ def queue_list(page=1, per_page=20, sort_key="start_time", reverse=True):
     try:
         job_item = JobItem.objects().where(task_type=SYNC_FINISHED_COUNT, status="RUNNING").to_dict()
         if not job_item:
-            rq = rq_manager.enqueue(sync_all_file_finished_count)
+            rq = rq_manager.enqueue(sync_all_file_finished_count,queue_name="default")
             task_id = str(rq.id)
             JobItem.create_record(task_id=rq.id,
                                   task_type=SYNC_FINISHED_COUNT,

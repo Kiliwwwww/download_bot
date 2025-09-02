@@ -1,3 +1,4 @@
 web: uvicorn app.fast.fast_app:server_app --reload --port $WEB_PORT --host 0.0.0.0
-worker: PYTHONPATH=. rq worker download --url $REDIS_URL
+worker_download: PYTHONPATH=. rq worker download --url $REDIS_URL
+worker_default: PYTHONPATH=. rq worker default --url $REDIS_URL
 dashboard: rq-dashboard --redis-url $REDIS_URL --port $DASHBOARD_PORT
