@@ -65,15 +65,16 @@ export function createJmBottomBarComponent(naive, privacyModeRef) {
                 {{get_privacy()? '关闭隐私模式':'开启隐私模式' }}
             </n-tooltip>
               
-
-
-        
-
-        
           <!-- 下载 bot酱 -->
-          <a href="https://github.com/Kiliwwwww/download_bot" target="_blank" title="下载 bot酱">
-            <img src="/public/img/logo.svg" style="width:50px; height:50px; border-radius:25px; background: linear-gradient(135deg, #ff7eb9, #ff758c); color:#fff; font-size:22px; font-weight:700; box-shadow:0 6px 14px rgba(0,0,0,0.2); transition: transform 0.2s;" />
-          </a>
+           <n-tooltip trigger="hover">
+                <template #trigger>
+                <a href="/" target="_blank" title="下载bot酱">
+                    <img src="/public/img/logo.svg" style="width:50px; height:50px; border-radius:25px; background: linear-gradient(135deg, #ff7eb9, #ff758c); color:#fff; font-size:22px; font-weight:700; box-shadow:0 6px 14px rgba(0,0,0,0.2); transition: transform 0.2s;" />
+                  </a>
+                </template>
+                下载bot酱
+           </n-tooltip>
+          
         </div>
 
         `,
