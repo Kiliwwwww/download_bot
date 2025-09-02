@@ -10,7 +10,7 @@ export function createJmListPage(Vue, naive) {
     watch(privacyMode, val => localStorage.setItem('privacyMode', val))
 
     const JmDetailModal = createJmDetailModal(naive, privacyMode)
-    const JmBottomBarComponent= createJmBottomBarComponent(naive)
+    const JmBottomBarComponent= createJmBottomBarComponent(naive, privacyMode)
     return {
         template: `
         <n-config-provider :theme-overrides="themeOverrides">

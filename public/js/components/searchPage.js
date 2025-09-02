@@ -7,7 +7,7 @@ export function createSearchPage(Vue, naive) {
     const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')
     watch(privacyMode, val => localStorage.setItem('privacyMode', val))
     const JmDetailModal = createJmDetailModal(naive, privacyMode)
-    const JmBottomBarComponent= createJmBottomBarComponent(naive)
+    const JmBottomBarComponent= createJmBottomBarComponent(naive,privacyMode)
     return {
         template: `
         <div class="search-page">
@@ -26,18 +26,10 @@ export function createSearchPage(Vue, naive) {
                     @keyup.enter="handleSearch"
                 />
                 <div class="search-buttons">
-                    <n-button 
-                        @click="handleSearch"
-                        class="search-button"
-                    >
+                    <a href="#" @click="handleSearch" style="color:#ff7eb9">
                         JMComic搜索
-                    </n-button>
-                    <n-button 
-                        @click="handleSearch"
-                        class="search-button"
-                    >
-                        手气不错
-                    </n-button>
+                    </a>
+                    
                 </div>
             </div>
 

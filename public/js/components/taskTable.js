@@ -122,7 +122,7 @@ export function createTaskTable(Vue, naive) {
             })
 
             const JmDetailModal = createJmDetailModal(naive, privacyMode)
-            const JmBottomBarComponent= createJmBottomBarComponent(naive)
+            const JmBottomBarComponent= createJmBottomBarComponent(naive, privacyMode)
 
             const openErrorModal = (msg) => {
                 currentError.value = msg
