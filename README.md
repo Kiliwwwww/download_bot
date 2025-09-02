@@ -29,51 +29,6 @@
 
 ---
 
-## 项目结构说明
-
-```
-jinman/
-├── app/                               # 核心业务逻辑和服务
-│   ├── celery/                        # Celery 相关任务处理
-│   │   ├── celery_worker.py           # Celery worker 启动文件
-│   │   └── task_manager.py            # 任务管理逻辑
-│   ├── fast/                          # FastAPI 相关模块
-│   │   ├── controller/                # 控制器层，处理请求逻辑
-│   │   │   ├── admin/                 # 管理员相关接口
-│   │   ├── router/                    # 路由配置
-│   │   ├── service/                   # 服务层，业务逻辑封装
-│   │   └── fast_app.py                # FastAPI 主程序入口
-│   ├── init/                           # 初始化相关模块
-│   ├── job/                            # 后台作业、定时任务
-│   └── utils/                          # 工具类、公共方法
-├── books/                              # 书籍或资源存储目录
-├── config/                             # 配置文件
-├── db/                                 # 数据库相关
-│   ├── migrations/                     # 数据库迁移脚本
-│   ├── database_tools.py               # 数据库工具类（连接、查询）
-│   ├── migration_checker.py            # 检测未执行迁移的工具
-│   └── migrator.py                     # 迁移执行器
-├── logs/                               # 日志文件存放目录
-│   └── logger.log
-├── public/                             # 静态文件目录
-│   ├── js/
-│   │   ├── api/                        # JS API 封装
-│   │   └── components/                 # 前端组件
-├── templates/                           # 前端模板文件（HTML）
-├── zip/                                 # ZIP 文件存放目录
-├── Procfile                             # 部署配置文件（Heroku 或类似环境）
-├── README.md                             # 项目说明文档
-├── app.sqlite                            # SQLite 数据库文件
-├── create_migration.py                   # 自动生成迁移脚本工具
-├── main.py                               # 项目启动入口
-├── migration_db.py                       # 数据库迁移脚本入口（可执行迁移）
-├── requirements.txt                      # Python 依赖列表
-
-```
-
-
----
-
 ## 使用说明
 ### 环境说明
 ```bash
@@ -81,7 +36,7 @@ jinman/
 # 使用Window的同学可以配置Docker环境，在Docker环境下拉取python:3.12的镜像
 docker pull python:3.12
 ```
-
+Docker启动容器的教程： [docker.md](md/docker.md)
 ### 初始化步骤
 
 ```bash
