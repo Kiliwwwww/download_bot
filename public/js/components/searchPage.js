@@ -112,7 +112,7 @@ export function createSearchPage(Vue, naive) {
                     const res = await searchJmComic({
                         query: val,
                         page: page.value,
-                        type: searchType.value || 'default'
+                        type: searchType.value || 'keyword'
                     })
                     if (res.code === 200) {
                         results.value = res.data.items || []
