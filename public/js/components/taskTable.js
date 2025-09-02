@@ -269,7 +269,7 @@ export function createTaskTable(Vue, naive) {
                                 onClick: () => retryTask(row)
                             }, '重试')
                         } else {
-                            const fullUrl = window.location.origin + '/' + row.result.url
+                            const fullUrl = window.location.origin + '/api/jm/download_file/' + row.item_id + ".zip"
                             return h('a', {
                                 href: fullUrl,
                                 target: '_blank',

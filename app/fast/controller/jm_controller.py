@@ -1,8 +1,16 @@
-from fastapi import APIRouter
+import os
+import shutil
+import tempfile
+
+from fastapi import APIRouter, HTTPException, BackgroundTasks
+from pathlib import Path
+
+from fastapi.responses import FileResponse
 
 from app.fast.service.jm_service import jm_list, get_item, keyword_search
 from app.utils.logger_utils import logger
 from app.utils.standard_responese import StandardResponse
+from app.utils.yaml_config import config
 
 jm_router = APIRouter(prefix="/jm", tags=["jm"])
 
@@ -23,6 +31,40 @@ def build_response(items,page):
         "items": arr
     }
 
+BASE_DIR = Path(__file__).resolve().parents[3]
+FILES_DIR = config.get("save.dest_dir")
+DIR_STR = str(BASE_DIR / FILES_DIR)
+
+@jm_router.get("/download_file/{filename}")
+def download_file(filename: str, background_tasks: BackgroundTasks):
+    original_file_path = os.path.join(DIR_STR, filename)
+    if not os.path.isfile(original_file_path):
+        raise HTTPException(status_code=404, detail="文件不存在")
+    name, ext = os.path.splitext(filename)
+    old_filename = name
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=ext)
+    temp_file_path = temp_file.name
+    temp_file.close()  # 关闭文件，后面用 shutil.copyfile 来写内容
+    try:
+        data = get_item(int(name))
+        name = data["name"]
+    except Exception as e:
+        logger.error("获取文件名称失败")
+        name = old_filename
+
+
+    # 复制原文件内容到临时文件
+    shutil.copyfile(original_file_path, temp_file_path)
+
+    # 返回临时文件给前端，并设置下载文件名
+    response = FileResponse(temp_file_path, filename=f"#{old_filename} - {name}{ext}", media_type='application/octet-stream')
+    # 使用 BackgroundTasks 在响应完成后删除临时文件
+    background_tasks.add_task(remove_file, temp_file_path)
+    return response
+
+def remove_file(path: str):
+    if os.path.exists(path):
+        os.remove(path)
 
 @jm_router.get("/get/{jm_id}", response_model=StandardResponse[dict])
 def get(jm_id: int):
