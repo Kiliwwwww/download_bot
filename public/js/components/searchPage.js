@@ -136,6 +136,21 @@ export function createSearchPage(Vue, naive) {
                 if (searchInput.value) {
                     searchInput.value.focus()
                 }
+                 // 解析 URL 参数
+                const params = new URLSearchParams(window.location.search)
+                const query = params.get('query')
+                const type = params.get('type')
+
+                if (query && type) {
+                    // 设置搜索类型（会自动设置 prefixText 和 placeholder）
+                    setSearchType(type)
+
+                    // 设置搜索内容
+                    queryInput.value = query
+
+                    // 调用搜索
+                    handleSearch()
+                }
             })
 
             return {
