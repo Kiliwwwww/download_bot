@@ -79,18 +79,18 @@ export function createJmBottomBarComponent(naive, privacyModeRef) {
                 </template>
                 前往搜索
             </n-tooltip>
-            <n-tooltip trigger="hover">
-                <template #trigger>
-                    <n-button @click="goTo('/')" title="主页" style="width:50px; height:50px; border-radius:25px; background: linear-gradient(135deg, #ff7eb9, #ff758c); color:#fff;">🏠</n-button>
-               
-                </template>
-                前往主页
-            </n-tooltip>
             <n-tooltip  trigger="hover">
                 <template #trigger>
                 <n-button @click="goTo('/admins/pages')" title="队列" style="width:50px; height:50px; border-radius:25px; background: linear-gradient(135deg, #ff7eb9, #ff758c); color:#fff;">📥</n-button>
                 </template>
                 前往下载队列
+            </n-tooltip>
+             <n-tooltip trigger="hover">
+                <template #trigger>
+                    <n-button @click="goTo('/')" title="主页" style="width:50px; height:50px; border-radius:25px; background: linear-gradient(135deg, #ff7eb9, #ff758c); color:#fff;">🏠</n-button>
+               
+                </template>
+                前往主页
             </n-tooltip>
             </div>
           </Transition>

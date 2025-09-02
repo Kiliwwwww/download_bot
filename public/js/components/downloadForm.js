@@ -1,10 +1,14 @@
 import {downloadById} from '../api/downloadService.js'
 import {themeOverrides} from '../utils/theme.js'
-
+import {createJmDetailModal} from '/public/js/model/JmDetailModal.js'
+import {createJmBottomBarComponent} from '/public/js/model/JmBottomBarComponent.js'
 export function createDownloadForm(Vue, naive) {
-    const {ref, computed} = Vue
+    const {ref, computed, watch} = Vue
     const {NCard, NInput, NButton, NTag, NConfigProvider, NTooltip, useMessage, useLoadingBar} = naive
-
+    const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')
+    watch(privacyMode, val => localStorage.setItem('privacyMode', val))
+    const JmDetailModal = createJmDetailModal(naive, privacyMode)
+    const JmBottomBarComponent= createJmBottomBarComponent(naive,privacyMode)
     return {
         template: `
       <div style="display: flex; justify-content: center; gap: 30px; margin-top: 200px;">
@@ -54,11 +58,13 @@ export function createDownloadForm(Vue, naive) {
                   closable
                   :color="{ color: '#fff', borderColor: '#ff7eb9', textColor: '#ff7eb9' }"
                   style="padding: 4px 10px; border-radius: 6px;"
-                  @close="removeId(index)">
+                  @close="removeId(index)"
+                  >
                   <template #avatar>
                     <n-avatar color="transparent" src="/public/img/book.svg"/>
                   </template>
-                  {{ id }}
+                  
+                  <a href="#" style="all: unset;cursor: pointer;color: inherit; text-decoration: none;" @click="JmDetailModal.setup().showDetail(id)">{{ id }}</a>
                 </n-tag>
               </div>
 
@@ -154,14 +160,13 @@ export function createDownloadForm(Vue, naive) {
              如果大家觉得好用的话就请麻烦宣传和赞助一下！<br>
              PS.目前只能下载JMComic内的漫画呀！别的网站的暂时未收录<br>
              <br>
-             <a href="/admins/pages" style="font-weight: 500;">前往任务队列 →</a><br>
+             <a href="/admins/pages" style="font-weight: 500;">前往任务队列 →</a>&nbsp&nbsp&nbsp&nbsp
+             <a href="/admins/pages/search.html" style="font-weight: 500;">前往搜索页面 →</a><br>
           </p>
-            <div style="position: fixed; bottom: 40px; right: 40px; display: flex; flex-direction: column; gap: 12px; z-index: 999;">
-              <a href="https://github.com/Kiliwwwww/download_bot" target="_blank">
-                <img src="/public/img/logo.svg" style="width:50px; height:50px; border-radius:25px; background: linear-gradient(135deg, #ff7eb9, #ff758c); color:#fff; font-size:22px; font-weight:700; box-shadow:0 6px 14px rgba(0,0,0,0.2); transition: transform 0.2s;" />
-              </a>
-            </div>
         </div>
+        <!-- 插入弹窗组件 -->
+        <component :is="JmDetailModal"/>
+        <component :is="JmBottomBarComponent"/>
       </div>
     `,
         setup() {
@@ -271,7 +276,9 @@ export function createDownloadForm(Vue, naive) {
                 hover,
                 moreBtns,
                 goToList,
-                loadingBar
+                loadingBar,
+                JmDetailModal,
+                JmBottomBarComponent
             }
         },
         components: {NCard, NInput, NButton, NTag, NConfigProvider, NTooltip}
