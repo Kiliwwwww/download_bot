@@ -33,8 +33,9 @@ for pkg in lsof tzdata; do
 done
 
 if [ "$need_update" = true ]; then
-  apt-get update -qq
-  apt-get install -y -qq $missing_pkgs
+  apt-get update
+  apt-get install -y tzdata
+  apt-get install -y lsof
 else
   log_info "所有依赖已安装，无需更新"
 fi
