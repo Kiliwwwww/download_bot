@@ -1,0 +1,56 @@
+/* 公共按钮样式 */
+.bar-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #7ebfff, #758cff);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bar-btn.pink {
+    background: linear-gradient(135deg, #ff7eb9, #ff758c);
+}
+
+/* 基本淡入淡出 */
+.fade-enter-active,
+.fade-leave-active {
+    transition: all 0.25s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+    transform: translateY(8px);
+}
+
+.fade-enter-to,
+.fade-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* bot酱按钮展开时的动画 */
+.extra-buttons-enter-active,
+.extra-buttons-leave-active {
+    transition: all 0.3s ease;
+}
+
+.extra-buttons-enter-from,
+.extra-buttons-leave-to {
+    opacity: 0;
+    transform: scale(0.9);
+}
+
+.extra-buttons-enter-to,
+.extra-buttons-leave-from {
+    opacity: 1;
+    transform: scale(1);
+}

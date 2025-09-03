@@ -12,16 +12,22 @@ export function createDownloadForm(Vue, naive) {
     return {
         template: `
       <div style="display: flex; justify-content: center; gap: 30px; margin-top: 200px;">
-        <a href="https://github.com/Kiliwwwww/download_bot" target="_blank" style="color: #ff7eb9;text-decoration: none;width: 260px; height: 340px;">
-            <img
-              src="/public/img/logo.webp"
-              alt="logo"
-              style="width: 260px; height: 340px; object-fit: cover; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); transition: transform 0.3s;"
-              @mouseover="hoverImg = true"
-              @mouseleave="hoverImg = false"
-              :style="{ transform: hoverImg ? 'scale(1.03)' : 'scale(1)' }"
-            />
-        </a>
+      <n-tooltip trigger="hover">
+        <template #trigger>
+          <a href="/admins/pages/search.html" target="_blank" style="color: #ff7eb9;text-decoration: none;width: 260px; height: 340px;">
+                <img
+                  src="/public/img/logo.webp"
+                  alt="logo"
+                  style="width: 260px; height: 340px; object-fit: cover; border-radius: 16px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); transition: transform 0.3s;"
+                  @mouseover="hoverImg = true"
+                  @mouseleave="hoverImg = false"
+                  :style="{ transform: hoverImg ? 'scale(1.03)' : 'scale(1)' }"
+                />
+            </a>
+        </template>
+      前往搜索页面
+      </n-tooltip>
+        
 
         <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
           <n-card 
