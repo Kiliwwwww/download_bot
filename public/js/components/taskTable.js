@@ -64,12 +64,13 @@ export function createTaskTable(Vue, naive) {
   
           <!-- 数据表 -->
           <n-data-table
-            :columns="columns"
+            :columns="task_columns()"
             :data="tasks"
             :bordered="true"
             :single-line="false"
             :loading="loading"
             size="medium"
+            :key="dataTableKey"
             style="border-radius: 8px;"
             v-model:checked-row-keys="checkedRowKeys"
             :row-key="rowKey"
@@ -113,6 +114,7 @@ export function createTaskTable(Vue, naive) {
             const page = ref(1)
             const perPage = ref(20)
             const loading = ref(false)
+            const dataTableKey = ref('key_')
 
             const checkedRowKeys = ref([]) // ✅ 存储选中的任务 ID
             const showErrorModal = ref(false)
@@ -123,7 +125,7 @@ export function createTaskTable(Vue, naive) {
             const loadingBar = useLoadingBar()
 
             const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')
-            watch(privacyMode, val => localStorage.setItem('privacyMode', val))
+
 
             const autoRefresh = ref(false)
             let refreshTimer = null
@@ -204,7 +206,7 @@ export function createTaskTable(Vue, naive) {
 
             const rowKey = (row) => row.item_id // 唯一标识每一行
 
-            const columns = [
+            let columns = [
                 {type: 'selection', width: 60}, // ✅ 多选框列
                 {
                     title: 'JM_ID',
@@ -221,14 +223,13 @@ export function createTaskTable(Vue, naive) {
                     title: '名称',
                     key: 'name',
                     align: 'center',
-                    width: 100,
                     render(row) {
-                        return h('span', {
+                        return h('div', {
                             style: {
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
-                                color: '#ff7eb9'
+                                color: '#ff7eb9',width: '350px'
                             },
                             onClick: () => JmDetailModal.setup().showDetail(row.result.item_id)
                         }, row.name)
@@ -334,7 +335,19 @@ export function createTaskTable(Vue, naive) {
                     }
                 }
             ]
-
+            const task_columns = () =>{
+                if(privacyMode.value){
+                    columns = columns.filter(item => item.key !== 'name')
+                }else{
+                    columns = temp_columns
+                }
+                return columns
+            }
+            const temp_columns = columns
+            watch(privacyMode, (val) => {
+                localStorage.setItem('privacyMode', val)
+                dataTableKey.value = 'key_' + Math.random()
+            })
             const loadTasks = async () => {
                 loading.value = true
                 try {
@@ -376,6 +389,8 @@ export function createTaskTable(Vue, naive) {
                 autoRefresh,
                 checkedRowKeys,
                 rowKey,
+                task_columns,
+                dataTableKey,
                 batchDownload
             }
         },
