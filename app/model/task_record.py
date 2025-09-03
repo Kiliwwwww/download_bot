@@ -15,5 +15,6 @@ TaskRecord = DBManager.model("task_records", {
     "result": JSONField(null=True),     # 结果，可为空，使用TextField适合较长内容
     "total_count": IntegerField(null=True),
     "finished_count": IntegerField(null=True),
-    "item_id": IntegerField(null=True)
+    "item_id": IntegerField(null=True),
+    "name": CharField(null=True)
 })

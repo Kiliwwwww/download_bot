@@ -7,7 +7,19 @@ import {createJmBottomBarComponent} from '/public/js/model/JmBottomBarComponent.
 
 export function createTaskTable(Vue, naive) {
     const {ref, h, onMounted, onBeforeUnmount, watch} = Vue
-    const {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, NSwitch, NProgress, useMessage, useLoadingBar} = naive
+    const {
+        NCard,
+        NSpace,
+        NButton,
+        NText,
+        NDataTable,
+        NModal,
+        NPagination,
+        NSwitch,
+        NProgress,
+        useMessage,
+        useLoadingBar
+    } = naive
 
     return {
         template: `
@@ -106,7 +118,7 @@ export function createTaskTable(Vue, naive) {
             const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')
             watch(privacyMode, val => localStorage.setItem('privacyMode', val))
 
-            const autoRefresh = ref(localStorage.getItem('autoRefresh') === 'true')
+            const autoRefresh = ref(false)
             let refreshTimer = null
             watch(autoRefresh, (val) => {
                 if (val) {
@@ -118,12 +130,13 @@ export function createTaskTable(Vue, naive) {
                 }
                 localStorage.setItem('autoRefresh', val)
             })
+            autoRefresh.value = localStorage.getItem('autoRefresh') === 'true'
             onBeforeUnmount(() => {
                 if (refreshTimer) clearInterval(refreshTimer)
             })
 
             const JmDetailModal = createJmDetailModal(naive, privacyMode)
-            const JmBottomBarComponent= createJmBottomBarComponent(naive, privacyMode)
+            const JmBottomBarComponent = createJmBottomBarComponent(naive, privacyMode)
 
             const openErrorModal = (msg) => {
                 currentError.value = msg
@@ -150,26 +163,7 @@ export function createTaskTable(Vue, naive) {
             }
 
             const columns = [
-                {
-                    title: '序号',
-                    key: 'index',
-                    align: 'center',
-                    render(_, index) {
-                      return h('span',{ style: { color: '#ff7eb9'}},index + 1)
-                    }
-                },
-                {
-                    title: '任务ID',
-                    key: 'task_id',
-                    align: 'center',
-                    render(row) {
-                        const shortText = row.task_id.length > task_id_max_size ? row.task_id.slice(0, task_id_max_size) : row.task_id
-                        return h('span', {
-                            style: {cursor: 'pointer', color: '#ff7eb9'},
-                            onClick: () => openIdModal('任务ID:  ' + row.task_id)
-                        }, shortText)
-                    }
-                },
+
                 {
                     title: 'JM_ID',
                     align: 'center',
@@ -179,6 +173,25 @@ export function createTaskTable(Vue, naive) {
                             style: {cursor: 'pointer', color: '#ff7eb9'},
                             onClick: () => JmDetailModal.setup().showDetail(row.result.item_id)
                         }, shortText)
+                    }
+                },
+                {
+                    title: '名称',
+                    key: 'name',
+                    align: 'center',
+                    render(row) {
+                        const shortText = row.name
+                        return h('div', {
+                            style: {
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                width: '200px',
+                                color: '#ff7eb9'
+                            },
+                            onClick: () => JmDetailModal.setup().showDetail(row.result.item_id)
+                        }, shortText)
+
                     }
                 },
                 {
@@ -205,17 +218,17 @@ export function createTaskTable(Vue, naive) {
                     render(row) {
                         let finished = row.finished_count || 0
                         const total = row.total_count || 0
-                        if(row.status === 'SUCCESS'){
+                        if (row.status === 'SUCCESS') {
                             finished = total
                         }
                         const percent = total > 0 ? Math.floor((finished / total) * 100) : 0
                         return h(NProgress, {
                             percentage: percent,
                             type: 'line',
-                            indicatorPlacement:"inside",
-                            style: {  },
+                            indicatorPlacement: "inside",
+                            style: {},
                             color: "#ff7eb9",
-                            processing:true
+                            processing: true
                         })
                     }
                 },
@@ -274,7 +287,7 @@ export function createTaskTable(Vue, naive) {
                             return h('a', {
                                 href: fullUrl,
                                 target: '_blank',
-                                style: {color: '#409EFF','text-decoration': 'none'}
+                                style: {color: '#409EFF', 'text-decoration': 'none'}
                             }, '下载')
                         }
                         return null

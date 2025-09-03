@@ -18,6 +18,7 @@ def start_download(jm_comic_id: int):
         return jm_comic_id
 
     page_count = int(jm_comic_data['page_count'])
+    name = jm_comic_data['name']
     rq = rq_manager.enqueue(download_item, int(jm_comic_id))
     task_id = str(rq.id)
     logger.info(task_id)
@@ -31,7 +32,8 @@ def start_download(jm_comic_id: int):
                              item_id=jm_comic_id,
                              user_id=1,
                              total_count=page_count,
-                             finished_count=0)
+                             finished_count=0,
+                             name=name)
     return task_id
 
 
