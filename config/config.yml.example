@@ -9,6 +9,7 @@ server:
   work_size: 3
   #rq 默认队列数量建议设为1
   default_size: 1
+  timeout: 7200
 database:
   type: sqlite
 #  mysql:

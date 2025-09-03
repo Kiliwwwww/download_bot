@@ -6,6 +6,8 @@ from app.model.task_record import TaskRecord
 from app.rq.rq_utils import RQManager
 from app.task.retry_task import retry_item
 from app.utils.logger_utils import logger
+from app.utils.yaml_config import config
+
 rq_manager = RQManager()
 
 def start_download(jm_comic_id: int):
@@ -19,7 +21,7 @@ def start_download(jm_comic_id: int):
 
     page_count = int(jm_comic_data['page_count'])
     name = jm_comic_data['name']
-    rq = rq_manager.enqueue(download_item, int(jm_comic_id))
+    rq = rq_manager.enqueue(download_item, int(jm_comic_id),queue_name="download",job_timeout=int(config.get("save.timeout", 7200)))
     task_id = str(rq.id)
     logger.info(task_id)
     TaskRecord.create_record(task_id=task_id,
@@ -44,7 +46,7 @@ def retry_download(task_id: str):
         item = data["result"]["item_id"]
         # logger.info(item)
         # retry_job.delay(jm_comic_id=int(item),task_id=str(task_id))
-        rq = rq_manager.enqueue(retry_item, int(item),str(task_id))
+        rq = rq_manager.enqueue(retry_item, int(item),str(task_id),queue_name="download",job_timeout=int(config.get("save.timeout", 7200)))
         task_id = str(rq.id)
         logger.info(task_id)
     else:
