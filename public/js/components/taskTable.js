@@ -26,7 +26,7 @@ export function createTaskTable(Vue, naive) {
       <div style="display: flex; justify-content: center; margin-top: 50px;">
         <n-card style="width: 1100px; padding: 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 12px;" 
                 size="huge" :bordered="false">
-         <h2 style="
+          <h2 style="
             font-weight: 800;
             font-size: 26px;
             background: linear-gradient(90deg, #ff7eb9, #ff758c);
@@ -49,10 +49,15 @@ export function createTaskTable(Vue, naive) {
           <!-- 顶部操作区 -->
           <n-space justify="space-between" align="center" style="margin-bottom: 20px;">
             <div style="display: flex; gap: 12px; align-items: center;">
+              <n-button type="primary" size="small" :disabled="checkedRowKeys.length===0" @click="batchDownload">
+                批量下载 ({{ checkedRowKeys.length }})
+              </n-button>
               <div style="display:flex; align-items:center; gap:6px;">
                 <span style="font-size:14px; color:#ff7eb9; font-weight:600;">自动刷新</span>
                 <n-switch v-model:value="autoRefresh" size="small"/>
               </div>
+              <!-- 批量操作按钮 -->
+              
             </div>
             <n-text depth="3">共 {{ total }} 个任务</n-text>
           </n-space>
@@ -66,6 +71,8 @@ export function createTaskTable(Vue, naive) {
             :loading="loading"
             size="medium"
             style="border-radius: 8px;"
+            v-model:checked-row-keys="checkedRowKeys"
+            :row-key="rowKey"
           ></n-data-table>
 
           <!-- 单独分页 -->
@@ -106,8 +113,8 @@ export function createTaskTable(Vue, naive) {
             const page = ref(1)
             const perPage = ref(20)
             const loading = ref(false)
-            const task_id_max_size = 6
 
+            const checkedRowKeys = ref([]) // ✅ 存储选中的任务 ID
             const showErrorModal = ref(false)
             const showIdModal = ref(false)
             const currentError = ref('')
@@ -122,9 +129,7 @@ export function createTaskTable(Vue, naive) {
             let refreshTimer = null
             watch(autoRefresh, (val) => {
                 if (val) {
-                    refreshTimer = setInterval(() => {
-                        loadTasks()
-                    }, 2500)
+                    refreshTimer = setInterval(() => loadTasks(), 2500)
                 } else {
                     if (refreshTimer) clearInterval(refreshTimer)
                 }
@@ -162,8 +167,45 @@ export function createTaskTable(Vue, naive) {
                 }
             }
 
-            const columns = [
+            // ✅ 批量下载方法
+            const batchDownload = async () => {
+                if (checkedRowKeys.value.length === 0) {
+                    message.warning("请先选择任务")
+                    return
+                }
 
+                try {
+                    loadingBar.start()
+                    const url = "/api/downloads/zip_download?folder_names=" + checkedRowKeys.value.join(',')
+                    const res = await fetch(url)
+                    if (!res.ok) throw new Error('下载失败')
+
+                    const now = new Date()
+                    const pad = (n) => String(n).padStart(2, '0')
+                    const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`
+                    let filename = `下载bot酱批量下载喵_${timestamp}.zip` // 默认文件名
+
+                    const blob = await res.blob()
+                    const downloadUrl = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = downloadUrl
+                    a.download = filename
+                    document.body.appendChild(a)
+                    a.click()
+                    document.body.removeChild(a)
+                    URL.revokeObjectURL(downloadUrl)
+                    loadingBar.finish()
+                } catch (err) {
+                    loadingBar.error()
+                    message.error(err.message || '下载失败')
+                }
+            }
+
+
+            const rowKey = (row) => row.item_id // 唯一标识每一行
+
+            const columns = [
+                {type: 'selection', width: 60}, // ✅ 多选框列
                 {
                     title: 'JM_ID',
                     align: 'center',
@@ -179,19 +221,17 @@ export function createTaskTable(Vue, naive) {
                     title: '名称',
                     key: 'name',
                     align: 'center',
+                    width: 100,
                     render(row) {
-                        const shortText = row.name
-                        return h('div', {
+                        return h('span', {
                             style: {
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
-                                width: '200px',
                                 color: '#ff7eb9'
                             },
                             onClick: () => JmDetailModal.setup().showDetail(row.result.item_id)
-                        }, shortText)
-
+                        }, row.name)
                     }
                 },
                 {
@@ -214,6 +254,7 @@ export function createTaskTable(Vue, naive) {
                 {
                     title: '下载进度',
                     key: 'progress',
+                    width: 130,
                     align: 'center',
                     render(row) {
                         let finished = row.finished_count || 0
@@ -226,20 +267,10 @@ export function createTaskTable(Vue, naive) {
                             percentage: percent,
                             type: 'line',
                             indicatorPlacement: "inside",
-                            style: {},
                             color: "#ff7eb9",
+                            width: '300px',
                             processing: true
                         })
-                    }
-                },
-                {
-                    title: '开始时间',
-                    key: 'start_time',
-                    align: 'center',
-                    render(row) {
-                        if (!row.start_time) return ''
-                        const d = new Date(row.start_time)
-                        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
                     }
                 },
                 {
@@ -247,27 +278,13 @@ export function createTaskTable(Vue, naive) {
                     key: 'end_time',
                     align: 'center',
                     render(row) {
-                        if (!row.end_time) return ''
+                        if (!row.end_time) return '--'
                         const d = new Date(row.end_time)
-                        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
-                    }
-                },
-                {
-                    title: '结果',
-                    key: 'result',
-                    align: 'center',
-                    render(row) {
-                        if (row.result && row.result.error) {
-                            const text = row.result.error
-                            const shortText = text.length > 20 ? text.slice(0, 20) + '...' : text
-                            return h('span', {
-                                style: {color: 'red', cursor: 'pointer', textDecoration: 'underline'},
-                                onClick: () => openErrorModal(text)
-                            }, shortText)
-                        } else if (row.result && row.result.url) {
-                            return h('p', {style: {color: "#ff7eb9"}}, '下载完成')
-                        }
-                        return null
+                        const text = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`
+                        return h('span', {
+                            target: '_blank',
+                            style: {color: '#ff7eb9', 'text-decoration': 'none'}
+                        }, text)
                     }
                 },
                 {
@@ -283,14 +300,37 @@ export function createTaskTable(Vue, naive) {
                                 onClick: () => retryTask(row)
                             }, '重试')
                         } else {
-                            const fullUrl = window.location.origin + '/api/jm/download_file/' + row.item_id + ".zip"
-                            return h('a', {
-                                href: fullUrl,
-                                target: '_blank',
-                                style: {color: '#409EFF', 'text-decoration': 'none'}
+                            return h(NButton, {
+                                type: 'text',
+                                size: 'small',
+                                style: {color: '#409EFF', cursor: 'pointer'},
+                                onClick: async () => {
+                                    try {
+                                        loadingBar.start()
+                                        const url = window.location.origin + '/api/jm/download_file/' + row.item_id + ".zip"
+                                        const res = await fetch(url)
+                                        if (!res.ok) throw new Error('下载失败')
+
+                                        // 生成时间戳文件名
+                                        const filename = `${row.name}.zip`
+
+                                        const blob = await res.blob()
+                                        const downloadUrl = URL.createObjectURL(blob)
+                                        const a = document.createElement('a')
+                                        a.href = downloadUrl
+                                        a.download = filename
+                                        document.body.appendChild(a)
+                                        a.click()
+                                        document.body.removeChild(a)
+                                        URL.revokeObjectURL(downloadUrl)
+                                        loadingBar.finish()
+                                    } catch (err) {
+                                        loadingBar.error()
+                                        message.error(err.message || '下载失败')
+                                    }
+                                }
                             }, '下载')
                         }
-                        return null
                     }
                 }
             ]
@@ -333,7 +373,10 @@ export function createTaskTable(Vue, naive) {
                 JmBottomBarComponent,
                 JmDetailModal,
                 privacyMode,
-                autoRefresh
+                autoRefresh,
+                checkedRowKeys,
+                rowKey,
+                batchDownload
             }
         },
         components: {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, NSwitch, NProgress}

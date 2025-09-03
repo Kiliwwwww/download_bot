@@ -1,12 +1,53 @@
-from fastapi import APIRouter
+import os
+import time
+import uuid
+import shutil
+import zipfile
+
+from fastapi import APIRouter, Query, BackgroundTasks
 from pydantic import BaseModel
+from starlette.responses import FileResponse
 
 from app.fast.service.start_job_service import start_download, retry_download
 from app.utils.logger_utils import logger
 
 from app.utils.standard_responese import StandardResponse
+from app.utils.yaml_config import config, jm_downloader
 
 downloads_router = APIRouter(prefix="/downloads", tags=["downloads"])
+
+BASE_DIR = jm_downloader.get("dir_rule.base_dir")
+
+def remove_file(path: str):
+    if os.path.exists(path):
+        os.remove(path)
+        logger.info(f"删除完成 remove {path}")
+
+@downloads_router.get("/zip_download")
+def download_folders(folder_names: str, background_tasks: BackgroundTasks = None):
+    # 解析前端传来的文件夹名称
+    logger.info(folder_names)
+    folder_list = folder_names.split(",")
+
+    # 生成临时 zip 文件路径
+    zip_filename = f"{uuid.uuid4().hex}.zip"
+    zip_path = os.path.join("/tmp", zip_filename)
+
+    # 检查文件夹并打包
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for folder in folder_list:
+            folder_path = os.path.join(BASE_DIR, folder)
+            if os.path.isdir(folder_path):
+                for root, dirs, files in os.walk(folder_path):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        arcname = os.path.relpath(file_path, BASE_DIR)  # 保持文件夹结构
+                        zipf.write(file_path, arcname)
+
+        # 添加后台任务删除 zip 文件
+    background_tasks.add_task(remove_file, zip_path)
+
+    return FileResponse(zip_path, filename=f"下载bot酱批量下载喵_{int(time.time())}.zip", media_type="application/zip")
 
 
 @downloads_router.get("/", response_model=StandardResponse[dict])
@@ -15,11 +56,14 @@ def read_root():
         data={"message": "Hello, FastAPI"}
     )
 
+
 class Item(BaseModel):
     jm_comic_ids: list
 
+
 class RetryItem(BaseModel):
     task_ids: list[str]
+
 
 # 修改成异步任务 常用测试id = 422866
 @downloads_router.post("/", response_model=StandardResponse[dict])
