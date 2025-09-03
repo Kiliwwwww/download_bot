@@ -106,7 +106,7 @@ export function createTaskTable(Vue, naive) {
             const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')
             watch(privacyMode, val => localStorage.setItem('privacyMode', val))
 
-            const autoRefresh = ref(false)
+            const autoRefresh = ref(localStorage.getItem('autoRefresh') === 'true')
             let refreshTimer = null
             watch(autoRefresh, (val) => {
                 if (val) {
@@ -116,6 +116,7 @@ export function createTaskTable(Vue, naive) {
                 } else {
                     if (refreshTimer) clearInterval(refreshTimer)
                 }
+                localStorage.setItem('autoRefresh', val)
             })
             onBeforeUnmount(() => {
                 if (refreshTimer) clearInterval(refreshTimer)
