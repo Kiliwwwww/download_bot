@@ -10,6 +10,9 @@ rq_manager = RQManager()
 
 def start_download(jm_comic_id: int):
     logger.info(f"jm_comic_id: {jm_comic_id}")
+    job = TaskRecord.objects().where(item_id=jm_comic_id,status="RUNNING").to_dict()
+    if job:
+        raise Exception("任务进行中请勿重新提交")
     jm_comic_data = get_item(jm_comic_id)
     if jm_comic_data is None:
         return jm_comic_id

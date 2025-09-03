@@ -127,10 +127,10 @@ export function createJmDetailModal(naive, privacyModeRef) {
 
             const message = useMessage()
             const handleDownload = (jmId) => {
-                message.info(`下载任务进入队列: #${jmId}`)
                 loadingBar.start()
                 downloadById([jmId]).then(res => {
                     if (res.code === 200) {
+                        message.info(`下载任务进入队列: #${jmId}`)
                         loadingBar.finish()
                     } else {
                         loadingBar.error()

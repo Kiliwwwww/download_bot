@@ -13,4 +13,6 @@ JobItem = DBManager.model("job_items", {
     "created_at": DateTimeField(null=True),    # 完成时间，可为空
     "updated_at": DateTimeField(null=False),  # 用户id，非空
     "user_id": IntegerField(null=True),     # 结果，可为空，使用TextField适合较长内容
+    "item_id": IntegerField(null=True),
+    "item_type": CharField(null=True),
 })
