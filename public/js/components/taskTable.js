@@ -255,7 +255,7 @@ export function createTaskTable(Vue, naive) {
                 {
                     title: '下载进度',
                     key: 'progress',
-                    width: 130,
+                    width: 150,
                     align: 'center',
                     render(row) {
                         let finished = row.finished_count || 0
