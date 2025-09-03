@@ -16,14 +16,19 @@ export function createJmBottomBarComponent(naive, privacyModeRef) {
               <template #trigger>
                 <n-button @click="goTo('/admins/pages/search.html')" title="搜索" class="bar-btn pink">🔍</n-button>
               </template>
-              前往搜索
+              搜索
             </n-tooltip>
-
+            <n-tooltip placement="left" trigger="hover">
+              <template #trigger>
+                <n-button @click="goTo('/admins/pages/jm_list_page.html?type=last')" title="搜索" class="bar-btn pink">📕</n-button>
+              </template>
+              漫画列表
+            </n-tooltip>
             <n-tooltip placement="left" trigger="hover">
               <template #trigger>
                 <n-button @click="goTo('/admins/pages')" title="队列" class="bar-btn pink">📥</n-button>
               </template>
-              前往下载队列
+              下载队列
             </n-tooltip>
 
             <n-tooltip placement="left" trigger="hover">
