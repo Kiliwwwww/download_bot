@@ -229,7 +229,7 @@ export function createTaskTable(Vue, naive) {
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
-                                color: '#ff7eb9',width: '350px'
+                                color: '#ff7eb9',width: '200px'
                             },
                             onClick: () => JmDetailModal.setup().showDetail(row.result.item_id)
                         }, row.name)
@@ -255,7 +255,7 @@ export function createTaskTable(Vue, naive) {
                 {
                     title: '下载进度',
                     key: 'progress',
-                    width: 150,
+                    width: 100,
                     align: 'center',
                     render(row) {
                         let finished = row.finished_count || 0
@@ -269,9 +269,27 @@ export function createTaskTable(Vue, naive) {
                             type: 'line',
                             indicatorPlacement: "inside",
                             color: "#ff7eb9",
-                            width: '300px',
                             processing: true
                         })
+                    }
+                },
+                {
+                    title: '结果',
+                    key: 'result',
+                    align: 'center',
+                    render(row) {
+                        if (row.result && row.result.error) {
+                            const text = row.result.error
+                            let size = privacyMode.value ? 20 : 10
+                            const shortText = text.length > size ? text.slice(0, size) + '...' : text
+                            return h('span', {
+                                style: {color: 'red', cursor: 'pointer', textDecoration: 'underline'},
+                                onClick: () => openErrorModal(text)
+                            }, shortText)
+                        } else if (row.result && row.result.url) {
+                            return h('p', {style: {color: "#ff7eb9"}}, '下载完成')
+                        }
+                        return null
                     }
                 },
                 {
