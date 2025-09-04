@@ -263,7 +263,9 @@ export function createTaskTable(Vue, naive) {
                         if (row.status === 'SUCCESS') {
                             finished = total
                         }
-                        const percent = total > 0 ? Math.floor((finished / total) * 100) : 0
+                        let percent = total > 0 ? Math.floor((finished / total) * 100) : 0
+                        if(percent > 100) percent = 100
+                        if(percent < 0) percent = 0
                         return h(NProgress, {
                             percentage: percent,
                             type: 'line',

@@ -8,6 +8,7 @@ from fastapi import APIRouter, Query, BackgroundTasks
 from pydantic import BaseModel
 from starlette.responses import FileResponse
 
+from app.fast.service.jm_service import get_item
 from app.fast.service.start_job_service import start_download, retry_download
 from app.utils.logger_utils import logger
 
@@ -38,10 +39,20 @@ def download_folders(folder_names: str, background_tasks: BackgroundTasks = None
         for folder in folder_list:
             folder_path = os.path.join(BASE_DIR, folder)
             if os.path.isdir(folder_path):
+                try:
+                    data = get_item(int(folder))
+                    new_folder_name = data['name']  # 想更换的文件夹名称
+                except Exception as e:
+                    logger.info("获取文件名失败")
+                    new_folder_name = folder  # 如果失败就用原始文件夹名
+
                 for root, dirs, files in os.walk(folder_path):
                     for file in files:
                         file_path = os.path.join(root, file)
-                        arcname = os.path.relpath(file_path, BASE_DIR)  # 保持文件夹结构
+                        # 原始相对路径
+                        arcname = os.path.relpath(file_path, BASE_DIR)
+                        # 替换掉开头的文件夹名
+                        arcname = arcname.replace(folder, new_folder_name, 1)
                         zipf.write(file_path, arcname)
 
         # 添加后台任务删除 zip 文件
