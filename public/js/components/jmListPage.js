@@ -24,7 +24,6 @@ export function createJmListPage(Vue, naive) {
           display:flex; 
           flex-direction:column; 
           align-items:center; 
-          min-height:100vh;
           padding:60px 20px;
         "
         >
