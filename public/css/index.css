@@ -54,3 +54,22 @@
     opacity: 1;
     transform: scale(1);
 }
+
+.jm-list-container {
+    background: linear-gradient(-45deg, #fff0f6, #ffffff, #ffe6f0, #ffdde9, #ffc4d9);
+    background-size: 200% 200%; /* 拉大背景比例，让过渡更平滑 */
+    animation: gradientFlow 10s ease-in-out infinite; /* 放慢动画时长，使用更柔和的缓动函数 */
+    background-attachment: fixed;
+}
+
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
