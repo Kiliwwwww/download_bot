@@ -50,7 +50,7 @@ export function createTaskTable(Vue, naive) {
           <n-space justify="space-between" align="center" style="margin-bottom: 20px;">
             <div style="display: flex; gap: 12px; align-items: center;">
               <n-button type="primary" size="small" :disabled="checkedRowKeys.length===0" @click="batchDownload">
-                批量下载 ({{ checkedRowKeys.length }})
+                下载文件 ({{ checkedRowKeys.length }})
               </n-button>
               <div style="display:flex; align-items:center; gap:6px;">
                 <span style="font-size:14px; color:#ff7eb9; font-weight:600;">自动刷新</span>
