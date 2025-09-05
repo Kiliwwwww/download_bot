@@ -179,23 +179,10 @@ export function createTaskTable(Vue, naive) {
                 try {
                     loadingBar.start()
                     const url = "/api/downloads/zip_download?folder_names=" + checkedRowKeys.value.join(',')
-                    const res = await fetch(url)
-                    if (!res.ok) throw new Error('下载失败')
-
-                    const now = new Date()
-                    const pad = (n) => String(n).padStart(2, '0')
-                    const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`
-                    let filename = `下载bot酱批量下载喵_${timestamp}.zip` // 默认文件名
-
-                    const blob = await res.blob()
-                    const downloadUrl = URL.createObjectURL(blob)
                     const a = document.createElement('a')
-                    a.href = downloadUrl
-                    a.download = filename
-                    document.body.appendChild(a)
+                    a.href = url
+                    a.target = '_blank'   // 新开标签下载，不影响当前页面
                     a.click()
-                    document.body.removeChild(a)
-                    URL.revokeObjectURL(downloadUrl)
                     loadingBar.finish()
                 } catch (err) {
                     loadingBar.error()
@@ -229,7 +216,7 @@ export function createTaskTable(Vue, naive) {
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
-                                color: '#ff7eb9',width: '200px'
+                                color: '#ff7eb9', width: '200px'
                             },
                             onClick: () => JmDetailModal.setup().showDetail(row.result.item_id)
                         }, row.name)
@@ -264,8 +251,8 @@ export function createTaskTable(Vue, naive) {
                             finished = total
                         }
                         let percent = total > 0 ? Math.floor((finished / total) * 100) : 0
-                        if(percent > 100) percent = 100
-                        if(percent < 0) percent = 0
+                        if (percent > 100) percent = 100
+                        if (percent < 0) percent = 0
                         return h(NProgress, {
                             percentage: percent,
                             type: 'line',
@@ -329,21 +316,10 @@ export function createTaskTable(Vue, naive) {
                                     try {
                                         loadingBar.start()
                                         const url = window.location.origin + '/api/jm/download_file/' + row.item_id + ".zip"
-                                        const res = await fetch(url)
-                                        if (!res.ok) throw new Error('下载失败')
-
-                                        // 生成时间戳文件名
-                                        const filename = `${row.name}.zip`
-
-                                        const blob = await res.blob()
-                                        const downloadUrl = URL.createObjectURL(blob)
                                         const a = document.createElement('a')
-                                        a.href = downloadUrl
-                                        a.download = filename
-                                        document.body.appendChild(a)
+                                        a.href = url
+                                        a.target = '_blank'   // 新开标签下载，不影响当前页面
                                         a.click()
-                                        document.body.removeChild(a)
-                                        URL.revokeObjectURL(downloadUrl)
                                         loadingBar.finish()
                                     } catch (err) {
                                         loadingBar.error()
@@ -355,10 +331,10 @@ export function createTaskTable(Vue, naive) {
                     }
                 }
             ]
-            const task_columns = () =>{
-                if(privacyMode.value){
+            const task_columns = () => {
+                if (privacyMode.value) {
                     columns = columns.filter(item => item.key !== 'name')
-                }else{
+                } else {
                     columns = temp_columns
                 }
                 return columns

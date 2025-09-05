@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pathlib import Path
 
 from fastapi.responses import FileResponse
+from starlette.responses import StreamingResponse
 
 from app.fast.service.jm_service import jm_list, get_item, search
 from app.utils.logger_utils import logger
@@ -35,36 +36,43 @@ BASE_DIR = Path(__file__).resolve().parents[3]
 FILES_DIR = config.get("save.dest_dir")
 DIR_STR = str(BASE_DIR / FILES_DIR)
 
+from urllib.parse import quote
+
 @jm_router.get("/download_file/{filename}")
-def download_file(filename: str, background_tasks: BackgroundTasks):
+def download_file(filename: str):
     original_file_path = os.path.join(DIR_STR, filename)
     if not os.path.isfile(original_file_path):
         raise HTTPException(status_code=404, detail="文件不存在")
+
     name, ext = os.path.splitext(filename)
     old_filename = name
-    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=ext)
-    temp_file_path = temp_file.name
-    temp_file.close()  # 关闭文件，后面用 shutil.copyfile 来写内容
     try:
         data = get_item(int(name))
         name = data["name"]
-    except Exception as e:
+    except Exception:
         logger.error("获取文件名称失败")
         name = old_filename
 
+    def iterfile(path: str):
+        with open(path, "rb") as f:
+            while chunk := f.read(1024 * 1024):  # 1MB 分块
+                yield chunk
 
-    # 复制原文件内容到临时文件
-    shutil.copyfile(original_file_path, temp_file_path)
+    # 中文文件名需要 URL encode
+    download_name = f"#{old_filename} - {name}{ext}"
+    quoted_name = quote(download_name)  # URL encode 中文
 
-    # 返回临时文件给前端，并设置下载文件名
-    response = FileResponse(temp_file_path, filename=f"#{old_filename} - {name}{ext}", media_type='application/octet-stream')
-    # 使用 BackgroundTasks 在响应完成后删除临时文件
-    background_tasks.add_task(remove_file, temp_file_path)
-    return response
+    headers = {
+        "Content-Disposition": f"attachment; filename*=UTF-8''{quoted_name}"
+    }
 
-def remove_file(path: str):
-    if os.path.exists(path):
-        os.remove(path)
+    return StreamingResponse(
+        iterfile(original_file_path),
+        media_type="application/octet-stream",
+        headers=headers
+    )
+
+
 
 @jm_router.get("/get/{jm_id}", response_model=StandardResponse[dict])
 def get(jm_id: int):
