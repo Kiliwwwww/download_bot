@@ -2,7 +2,7 @@ import os
 import sqlite3
 
 from app.utils.logger_utils import FileLogger, logger
-from app.utils.yaml_config import config
+from app.utils.yaml_config import config, jm_downloader
 from db.migration_checker import MigrationChecker
 
 
@@ -75,11 +75,13 @@ class AppInitializer:
         执行所有初始化操作
         """
 
-        # 确保 books 目录存在
-        self.ensure_dir("books")
+
 
         # 检查配置文件
         self.check_config_files()
+        # 确保 books 目录存在
+        self.ensure_dir(jm_downloader.get("dir_rule.base_dir"))
+        self.ensure_dir(config.get("save.dest_dir"))
         self.ensure_sqlite_db(config.get("database.sqlite.database"))
         checker = MigrationChecker()
         if checker.has_pending():
