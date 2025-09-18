@@ -299,7 +299,7 @@ export function createTaskTable(Vue, naive) {
                     render(row) {
                         if (row.result && row.result.error) {
                             const text = row.result.error
-                            let size = privacyMode.value ? 20 : 10
+                            let size = 10
                             const shortText = text.length > size ? text.slice(0, size) + '...' : text
                             return h('span', {
                                 style: {color: 'red', cursor: 'pointer', textDecoration: 'underline'},
