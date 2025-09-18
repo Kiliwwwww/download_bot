@@ -21,7 +21,7 @@ async def download_zip(folders: str = Query(...)):
     folders = folders.split(",")
 
     # 初始化 zipstream
-    z = zipstream.ZipFile(mode="w", compression=zipstream.ZIP_DEFLATED)
+    z = zipstream.ZipFile(mode="w", compression=zipstream.ZIP_DEFLATED, allowZip64=True)
 
     for folder in folders:
         data = get_item(int(folder))
