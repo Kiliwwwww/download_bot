@@ -17,12 +17,8 @@ docker build  --no-cache -t jinman-bot .
 ### 2️⃣ 运行容器并映射目录与端口
 
 ```bash
-docker run -d \
-  --name docker-jinman \
-  -p 12345:12345 \
-  -p 9181:9181 \
-  -v /你的/config/目录:/config \
-  jinman-bot
+docker run -d --name docker-jinman -p 12345:12345 -p 9181:9181 \ 
+  -v 你的config文件夹:/config -v 你的压缩包路径:/jinman/zip -v 你的图片存储路径:/jinman/books jinman-bot
 ```
 
 💡 注意：
