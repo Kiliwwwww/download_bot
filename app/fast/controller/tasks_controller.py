@@ -7,10 +7,12 @@ from app.utils.standard_responese import StandardResponse
 tasks_router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 @tasks_router.get("/queue", response_model=StandardResponse[dict])
-def queue(page: int = Query(1, ge=1), per_page: int = Query(10, ge=1, le=100)):
+def queue(page: int = Query(1, ge=1), per_page: int = Query(10, ge=1, le=100),
+          start_time:str = None, end_time:str = None):
     try:
         logger.info(f"page={page}, per_page={per_page}")
-        data = queue_list(page,per_page)
+        params = {"page": page, "per_page": per_page, "start_time": start_time, "end_time": end_time}
+        data = queue_list(params)
 
 
         return StandardResponse(

@@ -18,7 +18,9 @@ export function createTaskTable(Vue, naive) {
         NSwitch,
         NProgress,
         useMessage,
-        useLoadingBar
+        useLoadingBar,
+        NDatePicker,
+        zhCN
     } = naive
 
     return {
@@ -45,7 +47,7 @@ export function createTaskTable(Vue, naive) {
               <n-switch v-model:value="privacyMode" size="small"/>
             </div>
           </div>
-
+            
           <!-- 顶部操作区 -->
           <n-space justify="space-between" align="center" style="margin-bottom: 20px;">
             <div style="display: flex; gap: 12px; align-items: center;">
@@ -56,6 +58,17 @@ export function createTaskTable(Vue, naive) {
                 <span style="font-size:14px; color:#ff7eb9; font-weight:600;">自动刷新</span>
                 <n-switch v-model:value="autoRefresh" size="small"/>
               </div>
+              <n-date-picker
+                v-model:value="dateRange"
+                type="datetimerange"
+                size="small"
+                placeholder="选择时间范围"
+                :clearable="true"
+              />
+              <n-button size="small" @click="loadTasks" :disabled="!dateRange[0] || !dateRange[1]">
+                查询
+              </n-button>
+             
               <!-- 批量操作按钮 -->
               
             </div>
@@ -115,7 +128,14 @@ export function createTaskTable(Vue, naive) {
             const perPage = ref(20)
             const loading = ref(false)
             const dataTableKey = ref('key_')
+            const now = Date.now();
 
+            // 一年的毫秒数 = 365天 * 24小时 * 60分钟 * 60秒 * 1000毫秒
+            const oneYearMs = 365 * 24 * 60 * 60 * 1000;
+
+            // 一年前的时间戳
+            const oneYearAgo = now - oneYearMs;
+            const dateRange = ref([oneYearAgo, now]) // [开始时间, 结束时间]
             const checkedRowKeys = ref([]) // ✅ 存储选中的任务 ID
             const showErrorModal = ref(false)
             const showIdModal = ref(false)
@@ -123,6 +143,7 @@ export function createTaskTable(Vue, naive) {
             const currentId = ref('')
             const message = useMessage()
             const loadingBar = useLoadingBar()
+
 
             const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')
 
@@ -350,11 +371,39 @@ export function createTaskTable(Vue, naive) {
                 localStorage.setItem('privacyMode', val)
                 dataTableKey.value = 'key_' + Math.random()
             })
+
+           const formatTimestamp = (ts) =>{
+              const d = new Date(ts);
+              const year = d.getFullYear();
+              const month = String(d.getMonth() + 1).padStart(2, '0'); // 月份从0开始
+              const day = String(d.getDate()).padStart(2, '0');
+              const hour = String(d.getHours()).padStart(2, '0');
+              const minute = String(d.getMinutes()).padStart(2, '0');
+              const second = String(d.getSeconds()).padStart(2, '0');
+              return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+            }
             const loadTasks = async () => {
                 loading.value = true
                 try {
                     loadingBar.start()
-                    const res = await fetchTasks(page.value, perPage.value)
+                    const params = {
+                        page: page.value,
+                        per_page: perPage.value,
+                        start_time:null,
+                        end_time:null,
+                    }
+                    let start_time = null
+                    let end_time = null
+                    // 如果选择了时间范围
+                    if (dateRange.value[0] && dateRange.value[1]) {
+                        start_time = dateRange.value[0]
+                        let start_date = formatTimestamp(start_time)
+                        end_time = dateRange.value[1]
+                        let end_date = formatTimestamp(end_time)
+                        params.start_time = start_date.toLocaleString();
+                        params.end_time = end_date.toLocaleString();
+                    }
+                    const res = await fetchTasks(params.page, params.per_page, params.start_time, params.end_time)
                     const data = res.data || res
                     loadingBar.finish()
                     tasks.value = data.items || []
@@ -393,9 +442,11 @@ export function createTaskTable(Vue, naive) {
                 rowKey,
                 task_columns,
                 dataTableKey,
-                batchDownload
+                batchDownload,
+                dateRange,
+                formatTimestamp
             }
         },
-        components: {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, NSwitch, NProgress}
+        components: {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, NSwitch, NProgress,NDatePicker}
     }
 }

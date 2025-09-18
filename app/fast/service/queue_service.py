@@ -13,11 +13,10 @@ rq_manager = RQManager()
 
 
 
-def queue_list(page=1, per_page=20, sort_key="start_time", reverse=True):
+def queue_list(params={}, sort_key="start_time", reverse=True):
     """
     获取任务队列列表（支持排序 + 分页）
-    :param page: 当前页码，从 1 开始
-    :param per_page: 每页数量
+    :param params: 前端参数
     :param sort_key: 排序字段（任务 JSON 中的字段）
     :param reverse: 是否倒序（默认 True = 新任务在前）
     :return: dict {total: 总数, page: 当前页, per_page: 每页数量, items: 列表}
@@ -39,9 +38,20 @@ def queue_list(page=1, per_page=20, sort_key="start_time", reverse=True):
     except Exception as e:
         logger.error(str(e))
 
+    page = int(params.get("page", 1))
+    per_page = int(params.get("per_page", 10))
+    task = TaskRecord.objects()
 
+    # 查询时间范围
+    start_time = params.get("start_time", None)
+    end_time = params.get("end_time", None)
+    logger.info(f"start_time={start_time}, end_time={end_time}")
+    if start_time is not None:
+        task = task.where_expr(TaskRecord.start_time >= start_time)
+    if end_time is not None:
+        task = task.where_expr(TaskRecord.end_time <= end_time)
+    arr = task.to_dict()
 
-    arr = TaskRecord.objects().to_dict()
 
 
     arr = Paginator.sort(arr, sort_key, reverse)
