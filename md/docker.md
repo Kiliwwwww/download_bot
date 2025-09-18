@@ -4,7 +4,7 @@
 在 `Dockerfile` 所在目录打开终端，执行：
 
 ```bash
-docker build -t jinman-not .
+docker build  --no-cache -t jinman-bot .
 ```
 
 说明：
