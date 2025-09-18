@@ -45,12 +45,16 @@ def queue_list(params={}, sort_key="start_time", reverse=True):
     # 查询时间范围
     start_time = params.get("start_time", None)
     end_time = params.get("end_time", None)
-    logger.info(f"start_time={start_time}, end_time={end_time}")
+    keyword = params.get("keyword", None)
+    logger.info(f"start_time={start_time}, end_time={end_time}, keyword={keyword}")
     if start_time is not None:
         task = task.where_expr(TaskRecord.start_time >= start_time)
     if end_time is not None:
         task = task.where_expr(TaskRecord.end_time <= end_time)
+    if keyword is not None:
+        task = task.where_expr(TaskRecord.name.contains(keyword))
     arr = task.to_dict()
+
 
 
 

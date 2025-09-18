@@ -61,10 +61,9 @@ export function createTaskTable(Vue, naive) {
               <n-date-picker
                 v-model:value="dateRange"
                 type="datetimerange"
-                size="small"
                 placeholder="选择时间范围"
-                :clearable="true"
               />
+              <n-input v-model:value="inputSearch" placeholder="输入名称查询" style="width: 20%"  />
               <n-button size="small" @click="loadTasks" :disabled="!dateRange[0] || !dateRange[1]">
                 查询
               </n-button>
@@ -143,7 +142,7 @@ export function createTaskTable(Vue, naive) {
             const currentId = ref('')
             const message = useMessage()
             const loadingBar = useLoadingBar()
-
+            const inputSearch = ref('')
 
             const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')
 
@@ -360,7 +359,7 @@ export function createTaskTable(Vue, naive) {
             ]
             const task_columns = () => {
                 if (privacyMode.value) {
-                    columns = columns.filter(item => item.key !== 'name')
+                    columns = temp_columns
                 } else {
                     columns = temp_columns
                 }
@@ -391,6 +390,7 @@ export function createTaskTable(Vue, naive) {
                         per_page: perPage.value,
                         start_time:null,
                         end_time:null,
+                        keyword:inputSearch.value
                     }
                     let start_time = null
                     let end_time = null
@@ -403,7 +403,7 @@ export function createTaskTable(Vue, naive) {
                         params.start_time = start_date.toLocaleString();
                         params.end_time = end_date.toLocaleString();
                     }
-                    const res = await fetchTasks(params.page, params.per_page, params.start_time, params.end_time)
+                    const res = await fetchTasks(params.page, params.per_page, params.start_time, params.end_time, params.keyword)
                     const data = res.data || res
                     loadingBar.finish()
                     tasks.value = data.items || []
@@ -444,7 +444,8 @@ export function createTaskTable(Vue, naive) {
                 dataTableKey,
                 batchDownload,
                 dateRange,
-                formatTimestamp
+                formatTimestamp,
+                inputSearch
             }
         },
         components: {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, NSwitch, NProgress,NDatePicker}
