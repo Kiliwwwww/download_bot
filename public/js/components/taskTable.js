@@ -55,7 +55,6 @@ export function createTaskTable(Vue, naive) {
             
           <!-- 顶部操作区 -->
           <n-space justify="space-between" align="center" style="margin-bottom: 20px;">
-            <div style="display: flex; gap: 12px; align-items: center;">
               <n-button type="primary" size="small" :disabled="checkedRowKeys.length===0" @click="batchDownload">
                 下载文件 ({{ checkedRowKeys.length }})
               </n-button>
@@ -72,11 +71,10 @@ export function createTaskTable(Vue, naive) {
                 placeholder="选择时间范围"
               />
               
-              <n-input v-model:value="inputSearch" placeholder="输入名称查询" style="width: 20%"  />
+              <n-input v-model:value="inputSearch" placeholder="输入名称查询"  />
               <n-button  @click="loadTasks" type="primary" size="medium">
                 🔍 查询
               </n-button>
-            </div>
           </n-space>
   
           <!-- 数据表 -->
