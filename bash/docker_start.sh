@@ -2,17 +2,6 @@
 set -e  # 遇到错误立即退出
 set -o pipefail
 
-# 定义源目录和目标目录
-SRC_DIR="/config"
-DEST_DIR="/jinman/config"
-
-# 拷贝配置文件，使用 -f 强制覆盖
-cp -f "$SRC_DIR/config.yml" "$DEST_DIR/config.yml"
-cp -f "$SRC_DIR/jm_downloader.yml" "$DEST_DIR/jm_downloader.yml"
-
-# 拷贝 Procfile 到 /jinman 下
-cp -f "$SRC_DIR/Procfile" "/jinman/Procfile"
-
 # ======== 颜色定义 =========
 RED='\033[31m'
 GREEN='\033[32m'
@@ -23,10 +12,31 @@ log_info()    { echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')] $1${RESET}"; }
 log_warn()    { echo -e "${YELLOW}[$(date '+%Y-%m-%d %H:%M:%S')] $1${RESET}"; }
 log_error()   { echo -e "${RED}[$(date '+%Y-%m-%d %H:%M:%S')] $1${RESET}"; }
 
+# 定义源目录和目标目录
+SRC_DIR="/config"
+DEST_DIR="/jinman/config"
+
+# 拷贝配置文件，使用 -f 强制覆盖
+cp -f "$SRC_DIR/config.yml" "$DEST_DIR/config.yml"
+cp -f "$SRC_DIR/jm_downloader.yml" "$DEST_DIR/jm_downloader.yml"
+
+# 拷贝 Procfile 到 /jinman 下
+cp -f "$SRC_DIR/Procfile" "/jinman/Procfile"
+log_info "复制配置文件完成..."
+
+
+
 log_info "脚本开始执行..."
 
 # 切换目录
 cd /jinman || { log_error "目录 /jinman 不存在"; exit 1; }
+
+log_info "拉取最新代码..."
+git checkout main || { log_error "切换 main 分支失败"; exit 1; }
+git fetch origin
+git reset --hard origin/main
+log_info "拉取代码完成..."
+
 
 # ======== 检查并安装依赖 =========
 log_info "检查并安装必要依赖..."
