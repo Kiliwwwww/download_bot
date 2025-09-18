@@ -178,16 +178,22 @@ export function createTaskTable(Vue, naive) {
 
                 try {
                     loadingBar.start()
-                    const url = "/api/downloads/zip_download?folder_names=" + checkedRowKeys.value.join(',')
+
                     const a = document.createElement('a')
-                    a.href = url
-                    a.target = '_blank'   // 新开标签下载，不影响当前页面
+                    a.href = "/api/downloads/download_zip?folders=" + encodeURIComponent(checkedRowKeys.value.join(","))
+                    a.download = "folders.zip"
+                    a.target = "_blank"   // 可选，避免阻塞当前页
+                    document.body.appendChild(a)
                     a.click()
+                    a.remove()
+
                     loadingBar.finish()
                 } catch (err) {
                     loadingBar.error()
                     message.error(err.message || '下载失败')
                 }
+
+
             }
 
 

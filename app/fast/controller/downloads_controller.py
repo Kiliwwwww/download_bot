@@ -1,72 +1,54 @@
-import io
-import os
-import time
-import uuid
-import shutil
-import zipfile
-from fastapi.responses import StreamingResponse
-from fastapi import APIRouter, Query, BackgroundTasks
+from fastapi import *
 from pydantic import BaseModel
-from starlette.responses import FileResponse
-
+import zipstream
 from app.fast.service.jm_service import get_item
 from app.fast.service.start_job_service import start_download, retry_download
 from app.utils.logger_utils import logger
-
 from app.utils.standard_responese import StandardResponse
 from app.utils.yaml_config import config, jm_downloader
+import os
+import time
+import urllib.parse
+from fastapi.responses import StreamingResponse
 
 downloads_router = APIRouter(prefix="/downloads", tags=["downloads"])
 
 BASE_DIR = jm_downloader.get("dir_rule.base_dir")
 
 
-import io
-import os
-import time
-import zipfile
-import urllib.parse
-from fastapi.responses import StreamingResponse
+@downloads_router.get("/download_zip")
+async def download_zip(folders: str = Query(...)):
+    folders = folders.split(",")
 
-@downloads_router.get("/zip_download")
-def download_folders(folder_names: str):
-    folder_list = folder_names.split(",")
+    # 初始化 zipstream
+    z = zipstream.ZipFile(mode="w", compression=zipstream.ZIP_DEFLATED)
 
-    def iterfile():
-        zip_buffer = io.BytesIO()
-        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for folder in folder_list:
-                folder_path = os.path.join(BASE_DIR, folder)
-                if os.path.isdir(folder_path):
-                    try:
-                        data = get_item(int(folder))
-                        new_folder_name = data['name']
-                    except Exception:
-                        new_folder_name = folder
+    for folder in folders:
+        data = get_item(int(folder))
+        new_folder_name = data['name']   # 用新的文件夹名字
+        folder_path = os.path.join(BASE_DIR, str(folder))
+        if not os.path.exists(folder_path):
+            continue
 
-                    for root, dirs, files in os.walk(folder_path):
-                        for file in files:
-                            file_path = os.path.join(root, file)
-                            arcname = os.path.relpath(file_path, BASE_DIR)
-                            arcname = arcname.replace(folder, new_folder_name, 1)
-                            zipf.write(file_path, arcname)
+        for root, _, files in os.walk(folder_path):
+            for file in files:
+                abs_file_path = os.path.join(root, file)
 
-        zip_buffer.seek(0)
-        while chunk := zip_buffer.read(1024 * 1024):
-            yield chunk
+                # 原始相对路径
+                rel_path = os.path.relpath(abs_file_path, folder_path)
 
-    # 文件名
+                # 拼接新的文件夹名字
+                arcname = os.path.join(new_folder_name, rel_path)
+
+                z.write(abs_file_path, arcname)
+
+    # 返回 StreamingResponse
     raw_filename = f"下载bot酱批量下载喵_{int(time.time())}.zip"
     quoted_filename = urllib.parse.quote(raw_filename)
-
-    headers = {
-        "Content-Disposition": f"attachment; filename*=UTF-8''{quoted_filename}"
-    }
-
     return StreamingResponse(
-        iterfile(),
+        z,
         media_type="application/zip",
-        headers=headers
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{quoted_filename}"},
     )
 
 
