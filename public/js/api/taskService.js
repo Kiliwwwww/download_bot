@@ -1,7 +1,7 @@
-export async function fetchTasks(page = 1, perPage = 10, startTime = null, endTime = null, keyword = null) {
+export async function fetchTasks(page = 1, perPage = 10, startTime = null, endTime = null, keyword = null,status = null) {
     try {
-        console.log("fetchTasks called", page, perPage, startTime, endTime, keyword )  // 确认调用
-        const res = await axios.get('/api/tasks/queue?page='+page +'&per_page='+ perPage + '&start_time=' + startTime + "&end_time=" + endTime + "&keyword=" +keyword)
+        console.log("fetchTasks called", page, perPage, startTime, endTime, keyword,status)  // 确认调用
+        const res = await axios.get('/api/tasks/queue?page='+page +'&per_page='+ perPage + '&start_time=' + startTime + "&end_time=" + endTime + "&keyword=" +keyword + "&status="+ status)
         if (res.data.code === 200) {
             return res.data.data
         }

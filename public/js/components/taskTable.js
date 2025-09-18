@@ -17,10 +17,11 @@ export function createTaskTable(Vue, naive) {
         NPagination,
         NSwitch,
         NProgress,
-        useMessage,
-        useLoadingBar,
+        NSelect,
         NDatePicker,
-        zhCN
+        NInput,
+        useMessage,
+        useLoadingBar
     } = naive
 
     return {
@@ -43,6 +44,10 @@ export function createTaskTable(Vue, naive) {
           <!-- 隐私模式开关 -->
           <div style="position:absolute; top:20px; right:20px; display:flex; align-items:center; gap:12px;">
             <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:14px; color:#ff7eb9; font-weight:600;">自动刷新</span>
+                <n-switch v-model:value="autoRefresh" size="small"/>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
               <span style="font-size:14px; color:#ff7eb9; font-weight:600;">隐私模式</span>
               <n-switch v-model:value="privacyMode" size="small"/>
             </div>
@@ -54,24 +59,24 @@ export function createTaskTable(Vue, naive) {
               <n-button type="primary" size="small" :disabled="checkedRowKeys.length===0" @click="batchDownload">
                 下载文件 ({{ checkedRowKeys.length }})
               </n-button>
-              <div style="display:flex; align-items:center; gap:6px;">
-                <span style="font-size:14px; color:#ff7eb9; font-weight:600;">自动刷新</span>
-                <n-switch v-model:value="autoRefresh" size="small"/>
-              </div>
+              <n-select
+                v-model:value="selectedStatus"
+                placeholder="筛选状态"
+                :options="statusOptions"
+                style="width: 150px;"
+                clearable
+              />
               <n-date-picker
                 v-model:value="dateRange"
                 type="datetimerange"
                 placeholder="选择时间范围"
               />
-              <n-input v-model:value="inputSearch" placeholder="输入名称查询" style="width: 20%"  />
-              <n-button size="small" @click="loadTasks" :disabled="!dateRange[0] || !dateRange[1]">
-                查询
-              </n-button>
-             
-              <!-- 批量操作按钮 -->
               
+              <n-input v-model:value="inputSearch" placeholder="输入名称查询" style="width: 20%"  />
+              <n-button  @click="loadTasks" type="primary" size="medium">
+                🔍 查询
+              </n-button>
             </div>
-            <n-text depth="3">共 {{ total }} 个任务</n-text>
           </n-space>
   
           <!-- 数据表 -->
@@ -89,7 +94,9 @@ export function createTaskTable(Vue, naive) {
           ></n-data-table>
 
           <!-- 单独分页 -->
-          <div style="display:flex; justify-content:right; margin-top: 20px;">
+          <div style="display:flex; justify-content:right; margin-top: 20px; align-items:center;">
+            <n-text depth="3" style="margin-right: 10px">共 {{ total }} 个任务</n-text>
+          
             <n-pagination
               v-model:page="page"
               v-model:page-size="perPage"
@@ -129,14 +136,12 @@ export function createTaskTable(Vue, naive) {
             const dataTableKey = ref('key_')
             const now = Date.now();
 
-            // 一年的毫秒数 = 365天 * 24小时 * 60分钟 * 60秒 * 1000毫秒
             const oneYearMs = 365 * 24 * 60 * 60 * 1000;
             const oneHourMs = 60 * 60 * 1000
-
-            // 一年前的时间戳
             const oneYearAgo = now - oneYearMs;
-            const dateRange = ref([oneYearAgo, now + oneHourMs]) // [开始时间, 结束时间]
-            const checkedRowKeys = ref([]) // ✅ 存储选中的任务 ID
+            const dateRange = ref([oneYearAgo, now + oneHourMs])
+
+            const checkedRowKeys = ref([])
             const showErrorModal = ref(false)
             const showIdModal = ref(false)
             const currentError = ref('')
@@ -144,12 +149,18 @@ export function createTaskTable(Vue, naive) {
             const message = useMessage()
             const loadingBar = useLoadingBar()
             const inputSearch = ref('')
-
             const privacyMode = ref(localStorage.getItem('privacyMode') === 'true')
-
-
             const autoRefresh = ref(false)
             let refreshTimer = null
+
+            const selectedStatus = ref('')
+            const statusOptions = [
+                { label: '全部', value: '' },
+                { label: '进行中', value: 'RUNNING' },
+                { label: '已完成', value: 'SUCCESS' },
+                { label: '失败', value: 'ERROR' }
+            ]
+
             watch(autoRefresh, (val) => {
                 if (val) {
                     refreshTimer = setInterval(() => loadTasks(), 2500)
@@ -190,7 +201,6 @@ export function createTaskTable(Vue, naive) {
                 }
             }
 
-            // ✅ 批量下载方法
             const batchDownload = async () => {
                 if (checkedRowKeys.value.length === 0) {
                     message.warning("请先选择任务")
@@ -199,29 +209,24 @@ export function createTaskTable(Vue, naive) {
 
                 try {
                     loadingBar.start()
-
                     const a = document.createElement('a')
                     a.href = "/api/downloads/download_zip?folders=" + encodeURIComponent(checkedRowKeys.value.join(","))
                     a.download = "folders.zip"
-                    a.target = "_blank"   // 可选，避免阻塞当前页
+                    a.target = "_blank"
                     document.body.appendChild(a)
                     a.click()
                     a.remove()
-
                     loadingBar.finish()
                 } catch (err) {
                     loadingBar.error()
                     message.error(err.message || '下载失败')
                 }
-
-
             }
 
-
-            const rowKey = (row) => row.item_id // 唯一标识每一行
+            const rowKey = (row) => row.item_id
 
             let columns = [
-                {type: 'selection', width: 60}, // ✅ 多选框列
+                {type: 'selection', width: 60},
                 {
                     title: 'JM_ID',
                     align: 'center',
@@ -274,9 +279,7 @@ export function createTaskTable(Vue, naive) {
                     render(row) {
                         let finished = row.finished_count || 0
                         const total = row.total_count || 0
-                        if (row.status === 'SUCCESS') {
-                            finished = total
-                        }
+                        if (row.status === 'SUCCESS') finished = total
                         let percent = total > 0 ? Math.floor((finished / total) * 100) : 0
                         if (percent > 100) percent = 100
                         if (percent < 0) percent = 0
@@ -345,7 +348,7 @@ export function createTaskTable(Vue, naive) {
                                         const url = window.location.origin + '/api/jm/download_file/' + row.item_id + ".zip"
                                         const a = document.createElement('a')
                                         a.href = url
-                                        a.target = '_blank'   // 新开标签下载，不影响当前页面
+                                        a.target = '_blank'
                                         a.click()
                                         loadingBar.finish()
                                     } catch (err) {
@@ -358,30 +361,25 @@ export function createTaskTable(Vue, naive) {
                     }
                 }
             ]
-            const task_columns = () => {
-                if (privacyMode.value) {
-                    columns = temp_columns
-                } else {
-                    columns = temp_columns
-                }
-                return columns
-            }
-            const temp_columns = columns
+
+            const task_columns = () => columns
+
             watch(privacyMode, (val) => {
                 localStorage.setItem('privacyMode', val)
                 dataTableKey.value = 'key_' + Math.random()
             })
 
-           const formatTimestamp = (ts) =>{
-              const d = new Date(ts);
-              const year = d.getFullYear();
-              const month = String(d.getMonth() + 1).padStart(2, '0'); // 月份从0开始
-              const day = String(d.getDate()).padStart(2, '0');
-              const hour = String(d.getHours()).padStart(2, '0');
-              const minute = String(d.getMinutes()).padStart(2, '0');
-              const second = String(d.getSeconds()).padStart(2, '0');
-              return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
+            const formatTimestamp = (ts) =>{
+                const d = new Date(ts);
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const hour = String(d.getHours()).padStart(2, '0');
+                const minute = String(d.getMinutes()).padStart(2, '0');
+                const second = String(d.getSeconds()).padStart(2, '0');
+                return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
             }
+
             const loadTasks = async () => {
                 loading.value = true
                 try {
@@ -389,26 +387,20 @@ export function createTaskTable(Vue, naive) {
                     const params = {
                         page: page.value,
                         per_page: perPage.value,
-                        start_time:null,
-                        end_time:null,
-                        keyword:inputSearch.value
+                        start_time: null,
+                        end_time: null,
+                        keyword: inputSearch.value,
+                        status: selectedStatus.value
                     }
-                    let start_time = null
-                    let end_time = null
-                    // 如果选择了时间范围
                     if (dateRange.value[0] && dateRange.value[1]) {
-                        start_time = dateRange.value[0]
-                        let start_date = formatTimestamp(start_time)
-                        end_time = dateRange.value[1]
-                        let end_date = formatTimestamp(end_time)
-                        params.start_time = start_date.toLocaleString();
-                        params.end_time = end_date.toLocaleString();
+                        params.start_time = formatTimestamp(dateRange.value[0])
+                        params.end_time = formatTimestamp(dateRange.value[1])
                     }
-                    const res = await fetchTasks(params.page, params.per_page, params.start_time, params.end_time, params.keyword)
+                    const res = await fetchTasks(params.page, params.per_page, params.start_time, params.end_time, params.keyword, params.status)
                     const data = res.data || res
-                    loadingBar.finish()
                     tasks.value = data.items || []
                     total.value = data.total || 0
+                    loadingBar.finish()
                 } catch (err) {
                     loadingBar.error()
                     console.error('加载任务失败', err)
@@ -446,9 +438,11 @@ export function createTaskTable(Vue, naive) {
                 batchDownload,
                 dateRange,
                 formatTimestamp,
-                inputSearch
+                inputSearch,
+                selectedStatus,
+                statusOptions
             }
         },
-        components: {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, NSwitch, NProgress,NDatePicker}
+        components: {NCard, NSpace, NButton, NText, NDataTable, NModal, NPagination, NSwitch, NProgress, NSelect, NDatePicker, NInput}
     }
 }
