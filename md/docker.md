@@ -4,42 +4,37 @@
 在 `Dockerfile` 所在目录打开终端，执行：
 
 ```bash
-docker build -t jinman .
+docker build -t jinman-not .
 ```
 
-* `-t jinman` 是给镜像起名字，可以改成你喜欢的名字。
-* `.` 表示 Dockerfile 在当前目录。
+说明：
+
+* `-t jinman-not`：为镜像命名，可改为你喜欢的名字。
+* `.`：表示 Dockerfile 在当前目录。
 
 ---
 
 ### 2️⃣ 运行容器并映射目录与端口
 
 ```bash
-docker run -it -v /git/jinman_pull_bot:/jinman -p 12345:12345 -p 9181:9181 --name jinman-container jinman bash
+docker run -d \
+  --name docker-jinman \
+  -p 12345:12345 \
+  -p 9181:9181 \
+  -v /你的/config/目录:/config \
+  jinman-bot
 ```
 
-解释：
+💡 注意：
 
-* `-it`：交互模式，可以进入容器终端。
-* `-v /code/jinman:/jinman`：将本地 `/code/jinman` 映射到容器 `/jinman`。
-* `-p 12345:12345 -p 9181:9181`：将容器的 12345 和 9181 端口映射到本地，12345 和 9181分别对应服务器端口和监控端口。
-* `--name jinman-container`：给容器起个名字。
-* `jinman`：使用上一步构建的镜像。
+1. 映射的 `config` 文件夹必须包含以下文件：
 
----
+   * `config.yml`
+   * `jm_downloader.yml`
+   * `Procfile`
+2. 可以参考示例文件创建这些配置文件：
 
-### 3️⃣ 进入容器
+   * [Procfile.example](../Procfile.example)
+   * [config.yml.example](../config/config.yml.example)
+   * [jm\_downloader.yml.example](../config/jm_downloader.yml.example)
 
-如果你想在容器里操作：
-
-```bash
-docker exec -it jinman-container env LANG=C.UTF-8 bash
-```
-
-然后就可以在 `/jinman` 下看到本地代码了。
-
-然后通过命令启动服务器了
-```bash
- # 启动服务器
- bash bash/start.sh
-```

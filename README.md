@@ -36,7 +36,7 @@
 # 使用Window的同学可以配置Docker环境，在Docker环境下拉取python:3.12的镜像
 docker pull python:3.12
 ```
-Docker启动容器的教程： [docker.md](md/docker.md)
+Docker一键启动教程： [docker.md](md/docker.md)
 ### 初始化步骤
 
 ```bash
