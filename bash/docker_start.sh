@@ -122,5 +122,5 @@ mkdir -p log
 # 启动 honcho
 log_info "启动 honcho 后台服务..."
 log_info "honcho 已后台启动，日志输出到 log/production.log"
-honcho start -c worker_download=$WORK_SIZE,worker_default=$DEFAULT_SIZE >> log/production.log 2>&1
+honcho start -c worker_download=$WORK_SIZE,worker_default=$DEFAULT_SIZE
 
