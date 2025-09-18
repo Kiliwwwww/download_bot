@@ -131,10 +131,11 @@ export function createTaskTable(Vue, naive) {
 
             // 一年的毫秒数 = 365天 * 24小时 * 60分钟 * 60秒 * 1000毫秒
             const oneYearMs = 365 * 24 * 60 * 60 * 1000;
+            const oneHourMs = 60 * 60 * 1000
 
             // 一年前的时间戳
             const oneYearAgo = now - oneYearMs;
-            const dateRange = ref([oneYearAgo, now]) // [开始时间, 结束时间]
+            const dateRange = ref([oneYearAgo, now + oneHourMs]) // [开始时间, 结束时间]
             const checkedRowKeys = ref([]) // ✅ 存储选中的任务 ID
             const showErrorModal = ref(false)
             const showIdModal = ref(false)
