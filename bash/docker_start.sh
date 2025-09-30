@@ -32,9 +32,9 @@ log_info "脚本开始执行..."
 cd /jinman || { log_error "目录 /jinman 不存在"; exit 1; }
 
 log_info "拉取最新代码..."
-git checkout main || { log_error "切换 main 分支失败"; exit 1; }
-git fetch origin
-git reset --hard origin/main
+git checkout main || { log_warn "切换 main 分支失败，忽略继续执行"; }
+git fetch origin || { log_warn "git fetch 失败，忽略继续执行"; }
+git reset --hard origin/main || { log_warn "git reset 失败，忽略继续执行"; }
 log_info "拉取代码完成..."
 
 
