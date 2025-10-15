@@ -95,7 +95,7 @@ log_info "所有关键文件已就绪"
 
 # ======== 安装 Python 依赖 ========
 log_info "安装 Python 依赖..."
-pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install --no-cache-dir -r requirements.txt
 
 
 # ======== 数据库迁移 ========
