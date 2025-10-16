@@ -13,38 +13,32 @@ from fastapi.responses import StreamingResponse
 
 downloads_router = APIRouter(prefix="/downloads", tags=["downloads"])
 
-BASE_DIR = jm_downloader.get("dir_rule.base_dir")
+BASE_DIR = config.get("save.dest_dir")
 
 
 @downloads_router.get("/download_zip")
 async def download_zip(folders: str = Query(...)):
     folders = folders.split(",")
 
-    # 初始化 zipstream
     z = zipstream.ZipFile(mode="w", compression=zipstream.ZIP_DEFLATED, allowZip64=True)
 
     for folder in folders:
         data = get_item(int(folder))
-        new_folder_name = data['name']   # 用新的文件夹名字
-        folder_path = os.path.join(BASE_DIR, str(folder))
-        if not os.path.exists(folder_path):
-            continue
+        new_folder_name = data['name']  # 用新的文件名（不包含.zip）
 
-        for root, _, files in os.walk(folder_path):
-            for file in files:
-                abs_file_path = os.path.join(root, file)
+        # 获取对应的小 zip 路径
+        folder_zip_path = os.path.join(BASE_DIR, f"{folder}.zip")
 
-                # 原始相对路径
-                rel_path = os.path.relpath(abs_file_path, folder_path)
+        # 设置在总 zip 中的名称，例如 “课程A.zip”
+        arcname = f"{new_folder_name}.zip"
 
-                # 拼接新的文件夹名字
-                arcname = os.path.join(new_folder_name, rel_path)
+        # 写入整个小 zip 文件
+        z.write(folder_zip_path, arcname)
 
-                z.write(abs_file_path, arcname)
-
-    # 返回 StreamingResponse
+    # 构造返回的总 zip 文件名
     raw_filename = f"下载bot酱批量下载喵_{int(time.time())}.zip"
     quoted_filename = urllib.parse.quote(raw_filename)
+
     return StreamingResponse(
         z,
         media_type="application/zip",
